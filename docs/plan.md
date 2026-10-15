@@ -1,0 +1,11 @@
+### Milestone 1 – Proje Analizi ve Veritabanı Tasarımı
+
+ShareShelf projesinin ilk aşamasında, projenin temel işlevleri ve bu işlevler arasındaki ilişkiler analiz edilerek kapsamlı bir veritabanı tasarımı gerçekleştirilecektir. Bu aşamada kullanıcılar, kitaplar, kullanıcı kütüphaneleri, okuma listeleri, kitap değerlendirmeleri, alıntılar, fiziksel kitap paylaşımı ve ödünç alma süreçleri için gerekli tablolar belirlenecektir. Her tablo için gerekli alanlar, veri tipleri, birincil ve yabancı anahtarlar, zorunlu ve isteğe bağlı alanlar, benzersizlik kuralları ve tablolar arasındaki ilişkiler tanımlanacaktır. Tasarım tamamlandıktan sonra tüm sistemin veri modeli oluşturularak veritabanı şeması ve ilişkiler dokümante edilecektir.
+
+### Milestone 2 – Veritabanının Oluşturulması ve Kullanıcı Sisteminin Geliştirilmesi
+
+İkinci aşamada, birinci milestone kapsamında tasarlanan veritabanı yapısı gerçek veritabanı ortamına aktarılacak ve gerekli tablolar ile ilişkiler oluşturulacaktır. Veritabanı yapısının doğruluğu ve ilişkilerin tutarlılığı kontrol edildikten sonra kullanıcı sistemi geliştirilecektir. Kullanıcı kayıt, kullanıcı bilgilerinin görüntülenmesi ve güncellenmesi, gerekli doğrulama işlemleri ve kullanıcıya ait temel verilerin yönetilmesi sağlanacaktır. Kullanıcı yapısının diğer sistem bileşenleriyle ilişkilendirilebilmesi için gerekli altyapı hazırlanacak ve geliştirilen yapı API üzerinden test edilerek çalışır hâle getirilecektir.
+
+### Milestone 3 – Kitap, Kütüphane ve Okuma Listesi Sistemlerinin Geliştirilmesi
+
+Üçüncü aşamada ShareShelf'in temelini oluşturan kitap yönetimi ve kullanıcıların kitaplarla olan ilişkileri geliştirilecektir. Kitapların sisteme eklenmesi, görüntülenmesi, güncellenmesi, silinmesi ve aranabilmesi için gerekli yapı oluşturulacaktır. Bunun yanında kullanıcıların sahip oldukları veya okudukları kitapları kendi kütüphanelerine ekleyebilmeleri ve okumak istedikleri kitapları okuma listelerinde tutabilmeleri sağlanacaktır. Kitap değerlendirmeleri ve kullanıcıların kitaplarla ilgili alıntılarını kaydedebilmeleri için gerekli veri yapıları ve servisler de bu aşamada oluşturulacaktır. Böylece kullanıcı, kitap, kişisel kütüphane, okuma listesi, değerlendirme ve alıntı ilişkileri birlikte çalışır hâle getirilecek ve temel kitap sistemi tamamlanacaktır.
