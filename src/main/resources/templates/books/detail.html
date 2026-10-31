@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.title} + ' | ShareShelf'">Kitap Detayı | ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <script th:src="@{/js/auth.js}" defer></script>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="page-container detail-container">
+
+    <a class="breadcrumb" th:href="@{/books}">← Kitaplara geri dön</a>
+
+    <section class="detail-card">
+
+        <div class="detail-cover">
+            <img th:if="${book.coverImageUrl != null and !#strings.isEmpty(book.coverImageUrl)}"
+                 th:src="${book.coverImageUrl}"
+                 th:alt="${book.title}">
+
+            <div class="cover-placeholder"
+                 th:unless="${book.coverImageUrl != null and !#strings.isEmpty(book.coverImageUrl)}">
+                <span>📚</span>
+                <small>ShareShelf</small>
+            </div>
+        </div>
+
+        <div class="detail-content">
+
+            <span class="eyebrow">KİTAP DETAYI</span>
+            <h1 th:text="${book.title}">Kitap Adı</h1>
+            <p class="detail-author" th:text="${book.author}">Yazar Adı</p>
+
+            <div class="detail-meta">
+
+                <div th:if="${book.publicationYear != null}">
+                    <span>Yayın yılı</span>
+                    <strong th:text="${book.publicationYear}">2020</strong>
+                </div>
+
+                <div th:if="${book.publisher != null and !#strings.isEmpty(book.publisher)}">
+                    <span>Yayınevi</span>
+                    <strong th:text="${book.publisher}">Yayınevi</strong>
+                </div>
+
+                <div th:if="${book.pageCount != null}">
+                    <span>Sayfa sayısı</span>
+                    <strong th:text="${book.pageCount}">250</strong>
+                </div>
+
+                <div th:if="${book.isbn != null and !#strings.isEmpty(book.isbn)}">
+                    <span>ISBN</span>
+                    <strong th:text="${book.isbn}">ISBN</strong>
+                </div>
+
+            </div>
+
+            <div class="description-section">
+                <h2>Kitap Hakkında</h2>
+
+                <p th:if="${book.description != null and !#strings.isEmpty(book.description)}"
+                   th:text="${book.description}">Kitap açıklaması</p>
+
+                <p th:unless="${book.description != null and !#strings.isEmpty(book.description)}">
+                    Bu kitap için henüz bir açıklama eklenmemiş.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

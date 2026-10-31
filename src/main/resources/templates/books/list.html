@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitapları Keşfet | ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <script th:src="@{/js/auth.js}" defer></script>
+    <script th:src="@{/js/books.js}" defer></script>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="page-container">
+
+    <section class="hero-section">
+        <div class="hero-content">
+            <span class="eyebrow">SHARESHELF KİTAP TOPLULUĞU</span>
+            <h1>Bir kitap paylaş,<br>binlerce hikâyeye dokun.</h1>
+            <p>Yeni kitaplar keşfet, okuduğun kitapları paylaş ve kitapların yeniden hayat bulmasına katkıda bulun.</p>
+            <a class="hero-button"
+               th:href="${isAuthenticated} ? @{/books/new} : @{/login}"
+               th:text="${isAuthenticated} ? 'Kitap Paylaş' : 'Sen de paylaşmaya başla'">
+                Sen de paylaşmaya başla
+            </a>
+        </div>
+
+        <div class="hero-decoration">
+            <span>📚</span>
+            <span>📖</span>
+            <span>✨</span>
+        </div>
+    </section>
+
+    <section class="discovery-section">
+
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">KEŞFET</span>
+                <h2>Kitap dünyasına göz at</h2>
+                <p>Topluluğumuzdaki kitapları keşfet.</p>
+            </div>
+
+            <a class="add-book-button"
+               th:href="${isAuthenticated} ? @{/books/new} : @{/login}">
+                + Kitap Paylaş
+            </a>
+        </div>
+
+        <div class="search-box">
+            <span>⌕</span>
+            <input type="search" id="bookSearch" placeholder="Kitap adı veya yazar ara...">
+        </div>
+
+        <div class="book-count">
+            <span>Paylaşılan Kitaplar</span>
+            <strong th:text="${books.size()} + ' kitap'">0 kitap</strong>
+        </div>
+
+        <div class="book-grid" id="bookGrid">
+
+            <article class="book-card" th:each="book : ${books}">
+
+                <a class="book-card-link" th:href="@{/books/{id}(id=${book.id})}">
+
+                    <div class="book-cover">
+                        <img th:if="${book.coverImageUrl != null and !#strings.isEmpty(book.coverImageUrl)}"
+                             th:src="${book.coverImageUrl}"
+                             th:alt="${book.title}"
+                             loading="lazy">
+
+                        <div class="cover-placeholder"
+                             th:unless="${book.coverImageUrl != null and !#strings.isEmpty(book.coverImageUrl)}">
+                            <span>📚</span>
+                            <small>ShareShelf</small>
+                        </div>
+                    </div>
+
+                    <div class="book-info">
+                        <h3 th:text="${book.title}">Kitap Adı</h3>
+                        <p class="book-author" th:text="${book.author}">Yazar</p>
+
+                        <div class="book-meta">
+                            <span th:if="${book.publicationYear != null}"
+                                  th:text="${book.publicationYear}">2026</span>
+
+                            <span th:if="${book.pageCount != null}"
+                                  th:text="${book.pageCount} + ' sayfa'">250 sayfa</span>
+                        </div>
+                    </div>
+
+                </a>
+
+                <a class="detail-link" th:href="@{/books/{id}(id=${book.id})}">Detayları Gör →</a>
+
+            </article>
+
+        </div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(books)}">
+            <div class="empty-icon">📚</div>
+            <h3>Henüz paylaşılmış kitap yok</h3>
+            <p>İlk kitabı paylaşan sen olabilirsin. Kitapların yeni okuyucularla buluşsun!</p>
+            <a th:href="${isAuthenticated} ? @{/books/new} : @{/login}"
+               class="hero-button">Kitap Paylaş</a>
+        </div>
+
+        <div class="no-search-result" id="noSearchResult" hidden>
+            <h3>Aradığın kitap bulunamadı.</h3>
+            <p>Farklı bir kitap adı veya yazar deneyebilirsin.</p>
+        </div>
+
+    </section>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

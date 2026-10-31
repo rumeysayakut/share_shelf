@@ -1,0 +1,20 @@
+
+<header class="site-header" th:fragment="header(isAuthenticated)">
+    <div class="header-content">
+        <a class="brand" th:href="@{/books}">Share<span>Shelf</span></a>
+
+        <nav class="main-nav">
+            <a th:href="@{/books}">Kitapları Keşfet</a>
+
+            <a th:if="${!isAuthenticated}" th:href="@{/login}">Giriş Yap</a>
+
+            <a class="nav-register"
+               th:if="${!isAuthenticated}"
+               th:href="@{/register}">Kayıt Ol</a>
+
+            <a th:if="${isAuthenticated}"
+               href="#"
+               id="logoutButton">Çıkış Yap</a>
+        </nav>
+    </div>
+</header>

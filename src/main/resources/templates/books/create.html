@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Paylaş - ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/book-form.css}">
+    <script th:src="@{/js/auth.js}" defer></script>
+    <script th:src="@{/js/book-form.js}" defer></script>
+</head>
+<body>
+
+<header class="form-header">
+    <a class="brand" th:href="@{/books}">ShareShelf</a>
+    <a class="back-link" th:href="@{/books}">
+        <span>←</span> Kitaplara Dön
+    </a>
+</header>
+
+<main class="form-container">
+
+    <section class="form-intro">
+        <span class="form-eyebrow">PAYLAŞIMIN GÜCÜ</span>
+        <h1>Kitabını paylaş</h1>
+        <p>
+            Kütüphanene yeni bir kitap ekle. Gemini senin için kitap açıklamasını
+            oluştursun, sen de kontrol edip paylaş.
+        </p>
+    </section>
+
+    <form id="bookForm" class="book-form">
+
+        <section class="form-section">
+            <div class="section-heading">
+                <span class="section-number">01</span>
+                <div>
+                    <h2>Kitap bilgileri</h2>
+                    <p>Kitabın temel bilgilerini doldur.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="title">Kitap adı <span>*</span></label>
+                    <input type="text" id="title" maxlength="200"
+                           placeholder="Örn. Suç ve Ceza" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="author">Yazar <span>*</span></label>
+                    <input type="text" id="author" maxlength="150"
+                           placeholder="Örn. Fyodor Dostoyevski" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" id="isbn" maxlength="20"
+                           placeholder="ISBN numarası">
+                </div>
+
+                <div class="form-group">
+                    <label for="publisher">Yayınevi</label>
+                    <input type="text" id="publisher" maxlength="150"
+                           placeholder="Yayınevi adı">
+                </div>
+
+                <div class="form-group">
+                    <label for="publicationYear">Yayın yılı</label>
+                    <input type="number" id="publicationYear"
+                           min="1" max="2100" placeholder="Örn. 1866">
+                </div>
+
+                <div class="form-group">
+                    <label for="pageCount">Sayfa sayısı</label>
+                    <input type="number" id="pageCount"
+                           min="1" placeholder="Örn. 687">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="coverImageUrl">Kapak görseli URL</label>
+                    <input type="url" id="coverImageUrl" maxlength="1000"
+                           placeholder="https://...">
+                    <span class="input-hint">Kitabın kapak görselinin bağlantısını ekleyebilirsin.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section description-section">
+            <div class="section-heading">
+                <span class="section-number">02</span>
+                <div>
+                    <h2>Kitap açıklaması</h2>
+                    <p>Gemini ile otomatik açıklama oluştur.</p>
+                </div>
+            </div>
+
+            <div class="ai-info">
+                <span class="ai-icon">✦</span>
+                <div>
+                    <strong>Gemini ile açıklama oluştur</strong>
+                    <p>Kitap adı ve yazar bilgisine göre bir açıklama hazırlayalım.</p>
+                </div>
+            </div>
+
+            <button type="button" id="generateSummaryButton" class="ai-button">
+                <span>✦</span> Açıklama Oluştur
+            </button>
+
+            <div class="form-group description-group">
+                <label for="description">Kitap açıklaması <span>*</span></label>
+                <textarea id="description" rows="7"
+                          placeholder="Gemini tarafından oluşturulan açıklama burada görünecek. İstersen düzenleyebilirsin."
+                          required></textarea>
+                <span class="input-hint">Oluşturulan açıklamayı kaydetmeden önce düzenleyebilirsin.</span>
+            </div>
+        </section>
+
+        <div id="formMessage" class="form-message" role="alert"></div>
+
+        <div class="form-actions">
+            <a th:href="@{/books}" class="cancel-button">Vazgeç</a>
+            <button type="submit" id="saveBookButton" class="save-button">
+                Kitabı Paylaş
+            </button>
+        </div>
+
+    </form>
+</main>
+
+<footer class="form-footer">
+    <p>ShareShelf · Kitaplar paylaştıkça çoğalır.</p>
+</footer>
+
+</body>
+</html>

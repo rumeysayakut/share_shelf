@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitabı Düzenle | ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/book-form.css}">
+</head>
+<body>
+
+<header class="form-header">
+    <a class="brand" th:href="@{/books}">ShareShelf</a>
+    <a class="back-link" th:href="@{/books}">
+        <span>←</span> Kitaplara Dön
+    </a>
+</header>
+
+<main class="form-container">
+
+    <section class="form-intro">
+        <span class="form-eyebrow">KİTAP BİLGİLERİ</span>
+        <h1>Kitabını düzenle</h1>
+        <p>Kitap bilgilerini güncelleyebilir ve açıklamasını yeniden oluşturabilirsin.</p>
+    </section>
+
+    <form th:action="@{/books/{id}/edit(id=${book.id})}"
+          th:object="${bookRequest}"
+          method="post"
+          class="book-form">
+
+        <section class="form-section">
+            <div class="section-heading">
+                <span class="section-number">01</span>
+                <div>
+                    <h2>Kitap bilgileri</h2>
+                    <p>Kitabın bilgilerini güncelle.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="title">Kitap adı</label>
+                    <input type="text" id="title" th:field="*{title}" maxlength="200" required>
+                    <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="author">Yazar</label>
+                    <input type="text" id="author" th:field="*{author}" maxlength="150" required>
+                    <p th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" id="isbn" th:field="*{isbn}" maxlength="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="publisher">Yayınevi</label>
+                    <input type="text" id="publisher" th:field="*{publisher}" maxlength="150">
+                </div>
+
+                <div class="form-group">
+                    <label for="publicationYear">Yayın yılı</label>
+                    <input type="number" id="publicationYear" th:field="*{publicationYear}" min="1" max="2100">
+                </div>
+
+                <div class="form-group">
+                    <label for="pageCount">Sayfa sayısı</label>
+                    <input type="number" id="pageCount" th:field="*{pageCount}" min="1">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="coverImageUrl">Kapak görseli URL</label>
+                    <input type="url" id="coverImageUrl" th:field="*{coverImageUrl}" maxlength="1000">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section description-section">
+            <div class="section-heading">
+                <span class="section-number">02</span>
+                <div>
+                    <h2>Kitap açıklaması</h2>
+                    <p>Mevcut açıklamayı düzenleyebilir veya yeniden oluşturabilirsin.</p>
+                </div>
+            </div>
+
+            <button type="submit"
+                    th:formaction="@{/books/{id}/summary-preview(id=${book.id})}"
+                    formmethod="post"
+                    formnovalidate
+                    class="ai-button">
+                ✦ Açıklamayı Yeniden Oluştur
+            </button>
+
+            <div class="form-group description-group">
+                <label for="description">Kitap açıklaması</label>
+                <textarea id="description" th:field="*{description}" rows="7" required></textarea>
+                <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <a th:href="@{/books/{id}(id=${book.id})}" class="cancel-button">Vazgeç</a>
+            <button type="submit" class="save-button">Değişiklikleri Kaydet</button>
+        </div>
+
+    </form>
+</main>
+
+<footer class="form-footer">
+    <p>ShareShelf · Kitaplar paylaştıkça çoğalır.</p>
+</footer>
+
+</body>
+</html>
+ 

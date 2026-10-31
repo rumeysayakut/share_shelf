@@ -11,24 +11,15 @@ import java.time.LocalDateTime;
 public class BookResponseDto {
 
     private Long id;
-
     private String title;
-
     private String author;
-
     private String isbn;
-
     private String publisher;
-
     private Integer publicationYear;
-
     private Integer pageCount;
-
     private String coverImageUrl;
-
     private String description;
-
+    private Long createdById;
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 }

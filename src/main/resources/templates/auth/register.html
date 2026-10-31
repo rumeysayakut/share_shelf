@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol | ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script th:src="@{/js/auth.js}" defer></script>
+</head>
+<body>
+    <main class="auth-container">
+        <section class="auth-card">
+            <a class="brand" th:href="@{/books}">Share<span>Shelf</span></a>
+            <div class="book-icon">🍂</div>
+            <h1>ShareShelf'e katıl!</h1>
+            <p class="subtitle">Kitaplarını paylaş, yeni kitaplar keşfet.</p>
+
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                         <label for="firstName">Ad</label>
+                        <input type="text" id="firstName" name="firstName" placeholder="Adınız" maxlength="50" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Soyad</label>
+                        <input type="text" id="lastName" name="lastName" placeholder="Soyadınız" maxlength="50" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-posta adresi</label>
+                    <input type="email" id="email" name="email" placeholder="ornek@mail.com" maxlength="50" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Şifre</label>
+                    <input type="password" id="password" name="password" placeholder="En az 8 karakter" minlength="8" maxlength="30" required>
+                </div>
+
+                <p id="errorMessage" class="error-message"></p>
+
+                <button type="submit" class="auth-button" id="registerButton">Hesap Oluştur</button>
+            </form>
+
+            <p class="auth-footer">
+                Zaten hesabın var mı?
+                <a th:href="@{/login}">Giriş yap</a>
+            </p>
+
+            <a class="back-link" th:href="@{/books}">Kitaplara göz at</a>
+        </section>
+    </main>
+</body>
+</html>
