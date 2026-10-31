@@ -49,6 +49,9 @@ public class ReadingList {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+    
+    @Column(name = "description", length = 500)
+    private String description;
 
     @PrePersist
     protected void onCreate() {

@@ -1,3 +1,4 @@
+
 package com.shareshelf.config;
 
 import com.shareshelf.filter.JwtAuthenticationFilter;
@@ -32,7 +33,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfRepository)
                         .csrfTokenRequestHandler(csrfHandler)
-                        .ignoringRequestMatchers("/api/auth/mobile/**"))
+                        .ignoringRequestMatchers(
+                                "/api/auth/mobile/**",
+                                "/api/auth/login",
+                                "/api/auth/register"
+                        )
+                        .ignoringRequestMatchers(request -> {
+                            String authorization = request.getHeader("Authorization");
+                            return authorization != null && authorization.startsWith("Bearer ");
+                        }))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -45,7 +54,10 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/favicon.ico",
                                 "/api/auth/**",
-                                "/api/csrf"
+                                "/api/csrf",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers("/books/new").authenticated()
                         .requestMatchers("/books/*/edit").authenticated()
