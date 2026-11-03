@@ -2,6 +2,8 @@
 package com.shareshelf.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +20,9 @@ import java.util.Map;
 
 @Service
 public class GeminiService {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(GeminiService.class);
 
     private final RestClient restClient;
     private final String apiKey;
@@ -48,6 +53,8 @@ public class GeminiService {
     public String generateBookSummary(String title, String author) {
 
         if (apiKey == null || apiKey.isBlank()) {
+            logger.error("Gemini API anahtarı yapılandırılmamış.");
+
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE,
                     "Gemini API anahtarı yapılandırılmamış."
@@ -55,6 +62,8 @@ public class GeminiService {
         }
 
         if (model == null || model.isBlank()) {
+            logger.error("Gemini model yapılandırması bulunamadı.");
+
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE,
                     "Gemini model yapılandırması bulunamadı."
@@ -87,6 +96,11 @@ public class GeminiService {
         );
 
         try {
+            logger.info(
+                    "Gemini isteği gönderiliyor. Model: {}",
+                    model
+            );
+
             JsonNode response = restClient.post()
                     .uri("/v1beta/models/{model}:generateContent", model)
                     .header("x-goog-api-key", apiKey)
@@ -103,6 +117,11 @@ public class GeminiService {
                             .path("parts");
 
             if (parts == null || !parts.isArray()) {
+                logger.error(
+                        "Gemini geçerli bir yanıt döndürmedi. Yanıt: {}",
+                        response
+                );
+
                 throw new ResponseStatusException(
                         HttpStatus.BAD_GATEWAY,
                         "Gemini geçerli bir kitap açıklaması oluşturamadı."
@@ -122,22 +141,46 @@ public class GeminiService {
             String result = summary.toString().trim();
 
             if (result.isBlank()) {
+                logger.error(
+                        "Gemini boş açıklama döndürdü. Yanıt: {}",
+                        response
+                );
+
                 throw new ResponseStatusException(
                         HttpStatus.BAD_GATEWAY,
                         "Gemini boş bir kitap açıklaması döndürdü."
                 );
             }
 
+            logger.info("Gemini kitap açıklamasını başarıyla oluşturdu.");
+
             return result;
 
         } catch (RestClientResponseException exception) {
+
+            logger.error(
+                    "Gemini HTTP hatası. Status: {}, Yanıt: {}",
+                    exception.getStatusCode(),
+                    exception.getResponseBodyAsString()
+            );
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,
-                    "Gemini servisine erişilemedi. Bir süre sonra tekrar deneyin."
+                    "Gemini servisi hata döndürdü. HTTP kodu: "
+                            + exception.getStatusCode()
             );
+
         } catch (ResponseStatusException exception) {
             throw exception;
+
         } catch (Exception exception) {
+
+            logger.error(
+                    "Gemini bağlantı veya işlem hatası. Hata türü: {}",
+                    exception.getClass().getName(),
+                    exception
+            );
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,
                     "Kitap açıklaması oluşturulurken bir bağlantı hatası oluştu."

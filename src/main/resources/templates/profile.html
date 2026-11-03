@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilim | ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <script th:src="@{/js/auth.js}" defer></script>
+    <script th:src="@{/js/profile.js}" defer></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="profile-container">
+    <section class="profile-hero">
+        <div class="profile-avatar">
+            <span th:text="${#strings.substring(user.firstName, 0, 1)}">K</span>
+        </div>
+        <div class="profile-information">
+            <span class="profile-eyebrow">KİŞİSEL KİTAP ALANIN</span>
+            <h1 th:text="${user.firstName + ' ' + user.lastName}">Kullanıcı</h1>
+            <p th:text="${user.email}">email@example.com</p>
+            <span class="profile-date"
+                  th:text="${'ShareShelf üyesi • ' + #temporals.format(user.createdAt, 'dd.MM.yyyy')}">
+                ShareShelf üyesi
+            </span>
+        </div>
+        <div class="profile-decoration">📚</div>
+    </section>
+
+    <section class="lists-section">
+        <div class="section-heading">
+            <div>
+                <span class="profile-eyebrow">KİŞİSEL KOLEKSİYONLARIM</span>
+                <h2>Kitap Listelerim</h2>
+                <p>Kitaplarını kendi oluşturduğun listelerde düzenle.</p>
+            </div>
+            <button class="create-list-button" id="showListForm" type="button">
+                <span>＋</span> Yeni Liste Oluştur
+            </button>
+        </div>
+
+        <form class="list-form" id="listForm" hidden>
+            <div class="form-title-row">
+                <div>
+                    <span class="profile-eyebrow">KOLEKSİYON AYARLARI</span>
+                    <h3 id="listFormTitle">Yeni kitap listesi</h3>
+                </div>
+                <button type="button" class="close-form-button" id="cancelListForm">×</button>
+            </div>
+
+            <label for="listName">Liste adı</label>
+            <input type="text" id="listName" maxlength="100"
+                   placeholder="Örn. Yazın Okuyacaklarım" required>
+
+            <label for="listDescription">Açıklama</label>
+            <textarea id="listDescription" maxlength="500"
+                      placeholder="Bu liste hakkında birkaç şey yazabilirsin..."></textarea>
+
+            <label class="visibility-option">
+                <input type="checkbox" id="listPublic">
+                <span>
+                    <strong>Bu liste herkese açık olsun</strong>
+                    <small>Diğer kullanıcılar herkese açık listeni görüntüleyebilir.</small>
+                </span>
+            </label>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-button" id="cancelListButton">Vazgeç</button>
+                <button type="submit" class="save-button" id="saveListButton">Listeyi Oluştur</button>
+            </div>
+        </form>
+
+        <div class="profile-message" id="listMessage" hidden></div>
+
+        <div class="list-grid" id="listGrid">
+            <div class="loading-message">Listelerin yükleniyor...</div>
+        </div>
+    </section>
+
+    <section class="selected-list-section" id="selectedListSection" hidden>
+        <div class="selected-list-heading">
+            <div class="selected-list-title">
+                <span class="profile-eyebrow">KİŞİSEL KOLEKSİYONUN</span>
+                <h2 id="selectedListName"></h2>
+                <p id="selectedListDescription"></p>
+                <span class="list-visibility-badge" id="selectedListVisibility"></span>
+            </div>
+
+            <div class="selected-list-actions">
+                <button class="edit-list-button" id="editListButton" type="button">Düzenle</button>
+                <button class="delete-list-button" id="deleteListButton" type="button">Listeyi Sil</button>
+            </div>
+        </div>
+
+        <div class="list-toolbar">
+            <div>
+                <h3>Listendeki Kitaplar</h3>
+                <p>Kitaplarının okuma durumunu buradan değiştirebilirsin.</p>
+            </div>
+            <button class="create-list-button add-to-list-button" id="showAddBook" type="button">
+                ＋ Kitap Ekle
+            </button>
+        </div>
+
+        <div class="list-book-count" id="listBookCount">0 kitap</div>
+        <div class="list-book-grid" id="listBooks"></div>
+    </section>
+
+    <div class="profile-message" id="profileMessage" hidden></div>
+</main>
+
+<div class="modal-backdrop" id="addBookModal" hidden>
+    <section class="profile-modal">
+        <div class="modal-heading">
+            <div>
+                <span class="profile-eyebrow">KOLEKSİYONUNU GENİŞLET</span>
+                <h2>Listene Kitap Ekle</h2>
+                <p>ShareShelf'teki bir kitabı seçebilir veya yeni bir kitap oluşturabilirsin.</p>
+            </div>
+            <button class="close-modal-button" id="closeAddBook" type="button">×</button>
+        </div>
+
+        <div class="add-book-tabs">
+            <button type="button" class="add-book-tab active" data-tab="existing">Mevcut Kitaplar</button>
+            <button type="button" class="add-book-tab" data-tab="new">Yeni Kitap Oluştur</button>
+        </div>
+
+        <div class="add-book-content" id="existingBookPanel">
+            <label for="bookSearch">Kitap ara</label>
+            <input type="search" id="bookSearch" placeholder="Kitap adı veya yazar ara...">
+            <div class="available-books" id="availableBooks"></div>
+        </div>
+
+        <div class="add-book-content" id="newBookPanel" hidden>
+            <form id="newBookForm">
+                <div class="form-grid">
+                    <div class="form-field full-width">
+                        <label for="newBookTitle">Kitap adı *</label>
+                        <input type="text" id="newBookTitle" maxlength="200"
+                               placeholder="Kitabın adı" required>
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="newBookAuthor">Yazar *</label>
+                        <input type="text" id="newBookAuthor" maxlength="150"
+                               placeholder="Yazarın adı" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="newBookIsbn">ISBN</label>
+                        <input type="text" id="newBookIsbn" maxlength="20">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="newBookPublisher">Yayınevi</label>
+                        <input type="text" id="newBookPublisher" maxlength="150">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="newBookYear">Yayın yılı</label>
+                        <input type="number" id="newBookYear" min="1" max="2100">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="newBookPageCount">Sayfa sayısı</label>
+                        <input type="number" id="newBookPageCount" min="1">
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="newBookCover">Kapak görseli bağlantısı</label>
+                        <input type="url" id="newBookCover" maxlength="1000"
+                               placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="summary-box">
+                    <div class="summary-heading">
+                        <div>
+                            <strong>Kitap açıklaması</strong>
+                            <small>Gemini ile otomatik oluşturabilirsin.</small>
+                        </div>
+                        <button type="button" class="summary-button" id="generateSummaryButton">
+                            ✦ Açıklama Oluştur
+                        </button>
+                    </div>
+                    <textarea id="newBookDescription"
+                              placeholder="Önce kitap adı ve yazarını gir, ardından açıklama oluştur."
+                              required></textarea>
+                </div>
+
+                <div class="profile-message" id="newBookMessage" hidden></div>
+
+                <button type="submit" class="save-button create-book-submit" id="saveNewBookButton">
+                    Kitabı Oluştur ve Listeye Ekle
+                </button>
+            </form>
+        </div>
+    </section>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

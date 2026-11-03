@@ -12,6 +12,10 @@
                th:if="${!isAuthenticated}"
                th:href="@{/register}">Kayıt Ol</a>
 
+            <a class="nav-profile"
+               th:if="${isAuthenticated}"
+               th:href="@{/profile}">Profilim</a>
+
             <a th:if="${isAuthenticated}"
                href="#"
                id="logoutButton">Çıkış Yap</a>

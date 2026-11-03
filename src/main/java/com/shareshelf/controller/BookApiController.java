@@ -1,4 +1,3 @@
-
 package com.shareshelf.controller;
 
 import com.shareshelf.dto.request.BookRequestDto;
@@ -12,12 +11,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookApiController {
 
     private final BookService bookService;
+
+    @GetMapping
+    public List<BookResponseDto> getAllBooks() {
+        return bookService.getAllBooks();
+    }
 
     @PostMapping("/summary-preview")
     public BookSummaryResponseDto previewSummary(
