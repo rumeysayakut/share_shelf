@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Paylaş - ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/book-form.css}">
+    <link rel="stylesheet" th:href="@{/css/shares.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="form-container">
+
+    <section class="form-intro">
+        <span class="form-eyebrow">PAYLAŞIMIN GÜCÜ</span>
+        <h1>Kitabını paylaş</h1>
+        <p>
+            Kitaplığındaki bir kitabı seçerek ücretsiz ödünç paylaşımına açabilirsin.
+            Bir kitabın başka bir okuyucuya ulaşmasına yardımcı ol.
+        </p>
+    </section>
+
+    <form th:action="@{/shares}" th:object="${shareRequest}" method="post" class="book-form">
+
+        <section class="form-section">
+            <div class="section-heading">
+                <span class="section-number">01</span>
+                <div>
+                    <h2>Kitap seçimi</h2>
+                    <p>Paylaşmak istediğin kitabı kitaplığından seç.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bookId">Paylaşacağın kitap <span>*</span></label>
+                <select id="bookId" th:field="*{bookId}" required>
+                    <option value="">Bir kitap seç</option>
+                    <option th:each="userBook : ${userBooks}"
+                            th:value="${userBook.book.id}"
+                            th:text="${userBook.book.title + ' - ' + userBook.book.author}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="new-book-option">
+                <div>
+                    <strong>Kitabın kitaplığında yok mu?</strong>
+                    <p>Yeni bir kitap ekleyerek doğrudan paylaşabilirsin.</p>
+                </div>
+                <a th:href="@{/shares/new-book}" class="share-secondary-button">
+                    + Yeni Kitap Ekle
+                </a>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-heading">
+                <span class="section-number">02</span>
+                <div>
+                    <h2>Kitap hakkında</h2>
+                    <p>Kitabın fiziksel durumunu ve paylaşım notunu belirt.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="conditionDescription">Kitabın kondisyonu</label>
+                <textarea id="conditionDescription"
+                          th:field="*{conditionDescription}"
+                          rows="4"
+                          placeholder="Örn. Kitap temiz durumda, birkaç sayfasında küçük notlar var."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Paylaşım açıklaması</label>
+                <textarea id="description"
+                          th:field="*{description}"
+                          rows="4"
+                          placeholder="Kitabını ödünç almak isteyenlere iletmek istediğin bilgileri yazabilirsin."></textarea>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <a th:href="@{/shares}" class="cancel-button">Vazgeç</a>
+            <button type="submit" class="save-button">Paylaşımı Oluştur</button>
+        </div>
+
+    </form>
+
+</main>
+
+<footer class="site-footer">
+    <a class="brand" th:href="@{/books}">Share<span>Shelf</span></a>
+    <p>Kitaplar paylaştıkça çoğalır.</p>
+</footer>
+
+</body>
+</html>

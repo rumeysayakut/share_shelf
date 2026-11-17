@@ -6,6 +6,8 @@
         <nav class="main-nav">
             <a th:href="@{/books}">Kitapları Keşfet</a>
 
+            <a th:href="@{/shares}">Kitap Paylaşımı</a>
+
             <a th:if="${!isAuthenticated}" th:href="@{/login}">Giriş Yap</a>
 
             <a class="nav-register"

@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Kitap Ekle | ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/book-form.css}">
+    <link rel="stylesheet" th:href="@{/css/shares.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="share-page">
+
+    <section class="share-form-container">
+
+        <div class="share-form-heading">
+            <span class="share-eyebrow">KİTAP PAYLAŞIMI</span>
+            <h1>Yeni Kitap Ekle</h1>
+            <p>Kitabını kataloğa ekle ve ücretsiz olarak başka bir okuyucuyla paylaş.</p>
+        </div>
+
+        <form id="newShareBookForm"
+              th:action="@{/shares/new-book}"
+              th:object="${bookRequest}"
+              method="post">
+
+            <div class="form-section">
+                <h2>Kitap Bilgileri</h2>
+
+                <div class="form-group">
+                    <label for="title">Kitap Adı *</label>
+                    <input type="text" id="title" th:field="*{title}"
+                           placeholder="Kitabın adını gir"
+                           maxlength="200" required>
+                    <small class="field-error" th:if="${#fields.hasErrors('title')}"
+                           th:errors="*{title}"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Yazar *</label>
+                    <input type="text" id="author" th:field="*{author}"
+                           placeholder="Yazarın adını gir"
+                           maxlength="150" required>
+                    <small class="field-error" th:if="${#fields.hasErrors('author')}"
+                           th:errors="*{author}"></small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="isbn">ISBN</label>
+                        <input type="text" id="isbn" th:field="*{isbn}"
+                               placeholder="ISBN numarası">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="publisher">Yayınevi</label>
+                        <input type="text" id="publisher" th:field="*{publisher}"
+                               placeholder="Yayınevi">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="publicationYear">Yayın Yılı</label>
+                        <input type="number" id="publicationYear"
+                               th:field="*{publicationYear}"
+                               placeholder="2024" min="1" max="2100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pageCount">Sayfa Sayısı</label>
+                        <input type="number" id="pageCount"
+                               th:field="*{pageCount}"
+                               placeholder="250" min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="coverImageUrl">Kapak Görseli URL</label>
+                    <input type="url" id="coverImageUrl"
+                           th:field="*{coverImageUrl}"
+                           placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Kitap Açıklaması *</label>
+                    <textarea id="description" th:field="*{description}"
+                              rows="6"
+                              placeholder="Gemini ile kitap açıklaması oluşturabilir veya kendin düzenleyebilirsin."
+                              required></textarea>
+                    <small class="field-error"
+                           th:if="${#fields.hasErrors('description')}"
+                           th:errors="*{description}"></small>
+                </div>
+
+                <button type="button" id="generateSummaryButton"
+                        class="share-secondary-button">
+                    ✦ Gemini ile Açıklama Oluştur
+                </button>
+
+                <p id="formMessage" class="form-message"></p>
+            </div>
+
+            <div class="form-section">
+                <h2>Paylaşım Bilgileri</h2>
+
+                <div class="form-group">
+                    <label for="conditionDescription">Kitabın Durumu</label>
+                    <textarea id="conditionDescription"
+                              name="conditionDescription"
+                              rows="3"
+                              placeholder="Örneğin: Kitap temiz, birkaç sayfada çizim var."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="shareDescription">Paylaşım Notu</label>
+                    <textarea id="shareDescription"
+                              name="shareDescription"
+                              rows="3"
+                              placeholder="Kitabı almak isteyenlere iletmek istediğin notlar..."></textarea>
+                </div>
+            </div>
+
+            <div class="share-form-actions">
+                <a th:href="@{/shares}" class="share-cancel-button">Vazgeç</a>
+
+                <button type="submit" id="saveBookButton"
+                        class="share-submit-button">
+                    Kitabı Ekle ve Paylaş
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/auth.js}" defer></script>
+<script th:src="@{/js/shares-new-book.js}" defer></script>
+
+</body>
+</html>
