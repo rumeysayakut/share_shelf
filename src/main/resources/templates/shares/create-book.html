@@ -15,7 +15,7 @@
 
 <div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
 
-<main class="share-page">
+<main class="share-page share-new-book-page">
 
     <section class="share-form-container">
 
@@ -26,6 +26,7 @@
         </div>
 
         <form id="newShareBookForm"
+              class="share-new-book-form"
               th:action="@{/shares/new-book}"
               th:object="${bookRequest}"
               method="post">

@@ -1,0 +1,354 @@
+
+.share-create-page {
+    width: min(900px, calc(100% - 40px));
+    margin: 42px auto 75px;
+    font-family: inherit;
+}
+
+.share-create-page .form-intro {
+    max-width: 700px;
+    margin: 0 auto 32px;
+    text-align: center;
+}
+
+.share-create-page .form-eyebrow,
+.share-new-book-page .share-eyebrow {
+    display: inline-block;
+    color: #D97706;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.share-create-page .form-intro h1,
+.share-new-book-page .share-form-heading h1 {
+    margin: 10px 0;
+    color: #1B4332;
+    font-size: clamp(27px, 4vw, 35px);
+    font-weight: 700;
+    letter-spacing: -0.8px;
+}
+
+.share-create-page .form-intro p,
+.share-new-book-page .share-form-heading p {
+    max-width: 620px;
+    margin: 0 auto;
+    color: #77736D;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.share-create-form {
+    width: 100%;
+    padding: 34px;
+    border: 1px solid #E4DED3;
+    border-radius: 18px;
+    background: #FFFFFF;
+    box-shadow: 0 10px 30px rgba(31, 41, 55, 0.05);
+}
+
+.share-create-form .form-section,
+.share-new-book-form .form-section {
+    width: 100%;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid #EEE9E2;
+    border-radius: 14px;
+    background: #FDFCF9;
+}
+
+.share-create-form .section-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.share-create-form .section-number {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #EAF1EC;
+    color: #1B4332;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.share-create-form .section-heading h2,
+.share-new-book-form .form-section h2 {
+    margin: 2px 0 6px;
+    color: #1B4332;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.share-create-form .section-heading p {
+    margin: 0;
+    color: #77736D;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.share-create-form .form-group,
+.share-new-book-form .form-group {
+    width: 100%;
+    margin-bottom: 17px;
+}
+
+.share-create-form .form-group:last-child,
+.share-new-book-form .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.share-create-form .form-group label,
+.share-new-book-form .form-group label {
+    display: block;
+    margin: 0 0 8px;
+    color: #344B3D;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.share-create-form .form-group label span {
+    color: #D97706;
+}
+
+.share-create-form .form-group input,
+.share-create-form .form-group textarea,
+.share-create-form .form-group select,
+.share-new-book-form .form-group input,
+.share-new-book-form .form-group textarea,
+.share-new-book-form .form-group select {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 46px;
+    padding: 12px 14px;
+    border: 1px solid #DCDDD5;
+    border-radius: 8px;
+    outline: none;
+    background: #FFFFFF;
+    color: #26352C;
+    font-family: inherit;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.share-create-form .form-group textarea,
+.share-new-book-form .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.7;
+}
+
+.share-create-form .form-group input:focus,
+.share-create-form .form-group textarea:focus,
+.share-create-form .form-group select:focus,
+.share-new-book-form .form-group input:focus,
+.share-new-book-form .form-group textarea:focus,
+.share-new-book-form .form-group select:focus {
+    border-color: #4C8060;
+    box-shadow: 0 0 0 3px rgba(76, 128, 96, 0.12);
+}
+
+.share-create-form .new-book-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px 19px;
+    margin-top: 20px;
+    border: 1px solid #D8E3DA;
+    border-radius: 11px;
+    background: #F1F6F1;
+}
+
+.share-create-form .new-book-option strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #1B4332;
+    font-size: 13px;
+}
+
+.share-create-form .new-book-option p {
+    margin: 0;
+    color: #77736D;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.share-create-page .share-secondary-button,
+.share-new-book-page .share-secondary-button {
+    display: inline-flex;
+    min-height: 39px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    border: 1px solid #D8E3DA;
+    border-radius: 8px;
+    background: #EAF1EC;
+    color: #1B4332;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.share-create-page .share-secondary-button:hover,
+.share-new-book-page .share-secondary-button:hover {
+    transform: translateY(-1px);
+    background: #DCE9DF;
+}
+
+.share-create-page .form-actions,
+.share-new-book-page .share-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.share-create-page .cancel-button,
+.share-create-page .save-button,
+.share-new-book-page .share-cancel-button,
+.share-new-book-page .share-submit-button {
+    display: inline-flex;
+    min-height: 43px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 19px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.share-create-page .cancel-button,
+.share-new-book-page .share-cancel-button {
+    border: 1px solid #D8D4CC;
+    background: #FFFFFF;
+    color: #5F625F;
+}
+
+.share-create-page .cancel-button:hover,
+.share-new-book-page .share-cancel-button:hover {
+    background: #F5F3EE;
+}
+
+.share-create-page .save-button,
+.share-new-book-page .share-submit-button {
+    border: 1px solid #1B4332;
+    background: #1B4332;
+    color: #FFFFFF;
+}
+
+.share-create-page .save-button:hover,
+.share-new-book-page .share-submit-button:hover {
+    transform: translateY(-1px);
+    background: #286044;
+}
+
+.share-new-book-page {
+    width: min(900px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 42px 0 80px;
+    font-family: inherit;
+}
+
+.share-new-book-page .share-form-container {
+    width: 100%;
+    padding: 36px 40px;
+    border: 1px solid #E4DED3;
+    border-radius: 18px;
+    background: #FFFFFF;
+    box-shadow: 0 10px 30px rgba(31, 41, 55, 0.05);
+}
+
+.share-new-book-page .share-form-heading {
+    margin: 0 auto 30px;
+    text-align: center;
+}
+
+.share-new-book-form .form-section h2 {
+    margin-bottom: 22px;
+}
+
+.share-new-book-form .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.share-new-book-form .field-error {
+    display: block;
+    margin-top: 6px;
+    color: #B54735;
+    font-size: 11px;
+}
+
+.share-new-book-form .form-message {
+    margin: 12px 0 0;
+    color: #77736D;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.share-new-book-form .share-secondary-button {
+    margin-top: 2px;
+}
+
+.share-new-book-form .share-form-actions {
+    padding-top: 5px;
+}
+
+@media (max-width: 650px) {
+    .share-create-page,
+    .share-new-book-page {
+        width: calc(100% - 30px);
+        margin-top: 25px;
+        padding-top: 20px;
+    }
+
+    .share-create-form,
+    .share-new-book-page .share-form-container {
+        padding: 20px 15px;
+        border-radius: 14px;
+    }
+
+    .share-create-form .form-section,
+    .share-new-book-form .form-section {
+        padding: 19px 14px;
+    }
+
+    .share-create-form .new-book-option {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .share-new-book-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .share-create-page .form-actions,
+    .share-new-book-page .share-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .share-create-page .cancel-button,
+    .share-create-page .save-button,
+    .share-new-book-page .share-cancel-button,
+    .share-new-book-page .share-submit-button {
+        width: 100%;
+    }
+}
