@@ -42,15 +42,16 @@ public class BookController {
             @PathVariable Long id,
             Model model,
             @AuthenticationPrincipal User currentUser) {
+
         model.addAttribute("book", bookService.getBookById(id));
         model.addAttribute("isAuthenticated", currentUser != null);
+
         return "books/detail";
     }
 
     @GetMapping("/new")
-    public String showCreateBookForm(Model model) {
-        model.addAttribute("bookRequest", new BookRequestDto());
-        return "books/create";
+    public String showCreateBookForm() {
+        return "redirect:/shares/new-book";
     }
 
     @PostMapping
@@ -61,10 +62,12 @@ public class BookController {
             Model model) {
 
         if (bindingResult.hasErrors()) {
+            model.addAttribute("isAuthenticated", currentUser != null);
             return "books/create";
         }
 
         bookService.createBook(request, currentUser);
+
         return "redirect:/books";
     }
 
@@ -79,6 +82,7 @@ public class BookController {
 
         model.addAttribute("book", book);
         model.addAttribute("bookRequest", toRequestDto(book));
+        model.addAttribute("isAuthenticated", currentUser != null);
 
         return "books/edit";
     }
@@ -94,10 +98,12 @@ public class BookController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("book",
                     bookService.getBookForEdit(id, currentUser));
+            model.addAttribute("isAuthenticated", currentUser != null);
             return "books/edit";
         }
 
         bookService.updateBook(id, request, currentUser);
+
         return "redirect:/books/" + id;
     }
 
@@ -118,6 +124,7 @@ public class BookController {
 
         model.addAttribute("book", book);
         model.addAttribute("bookRequest", request);
+        model.addAttribute("isAuthenticated", currentUser != null);
 
         return "books/edit";
     }

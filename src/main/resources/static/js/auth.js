@@ -1,5 +1,6 @@
 
 let accessToken = null;
+let refreshPromise = null;
 
 async function getCsrfToken() {
     const response = await fetch("/api/csrf", {
@@ -89,20 +90,35 @@ async function register(firstName, lastName, email, password) {
 }
 
 async function refreshAccessToken() {
-    const csrfToken = await getCsrfToken();
+    if (refreshPromise) {
+        return refreshPromise;
+    }
 
-    const response = await fetch("/api/auth/refresh", {
-        method: "POST",
-        headers: {
-            "X-XSRF-TOKEN": csrfToken
-        },
-        credentials: "same-origin"
-    });
+    refreshPromise = (async () => {
+        const csrfToken = await getCsrfToken();
 
-    const data = await readResponse(response);
-    accessToken = data.accessToken;
+        const response = await fetch("/api/auth/refresh", {
+            method: "POST",
+            headers: {
+                "X-XSRF-TOKEN": csrfToken
+            },
+            credentials: "same-origin"
+        });
 
-    return accessToken;
+        const data = await readResponse(response);
+        accessToken = data.accessToken;
+
+        return accessToken;
+    })();
+
+    try {
+        return await refreshPromise;
+    } catch (error) {
+        accessToken = null;
+        throw error;
+    } finally {
+        refreshPromise = null;
+    }
 }
 
 async function logout() {
