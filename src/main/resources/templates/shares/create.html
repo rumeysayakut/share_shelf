@@ -26,6 +26,7 @@
     </section>
 
     <form th:action="@{/shares}" th:object="${shareRequest}" method="post" class="book-form share-create-form">
+        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
         <section class="form-section">
             <div class="section-heading">
@@ -97,6 +98,8 @@
     <a class="brand" th:href="@{/books}">Share<span>Shelf</span></a>
     <p>Kitaplar paylaştıkça çoğalır.</p>
 </footer>
+
+<script th:src="@{/js/auth.js}" defer></script>
 
 </body>
 </html>

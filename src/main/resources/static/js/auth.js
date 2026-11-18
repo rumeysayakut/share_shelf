@@ -237,3 +237,55 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
+
+
+
+(function attachCsrfToForms() {
+    function getCookie(name) {
+        const match = document.cookie
+            .split("; ")
+            .find(row => row.startsWith(name + "="));
+        return match ? decodeURIComponent(match.split("=")[1]) : null;
+    }
+
+    function injectCsrfTokens() {
+        const csrfToken = getCookie("XSRF-TOKEN");
+        if (!csrfToken) return;
+
+        document.querySelectorAll('form[method="post"], form[method="POST"]').forEach(form => {
+            let input = form.querySelector('input[name="_csrf"]');
+            if (!input) {
+                input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "_csrf";
+                form.appendChild(input);
+            }
+            input.value = csrfToken;
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", injectCsrfTokens);
+    } else {
+        injectCsrfTokens();
+    }
+
+
+    document.addEventListener("submit", (event) => {
+        const form = event.target;
+        if (form && form.method && form.method.toUpperCase() === "POST") {
+            const csrfToken = getCookie("XSRF-TOKEN");
+            if (csrfToken) {
+                let input = form.querySelector('input[name="_csrf"]');
+                if (!input) {
+                    input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "_csrf";
+                    form.appendChild(input);
+                }
+                input.value = csrfToken;
+            }
+        }
+    }, true);
+})();

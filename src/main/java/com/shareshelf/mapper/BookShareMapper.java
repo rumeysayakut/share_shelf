@@ -1,4 +1,3 @@
-
 package com.shareshelf.mapper;
 
 import org.mapstruct.Mapper;
@@ -25,5 +24,6 @@ public interface BookShareMapper {
     @Mapping(target = "bookId", source = "book.id")
     @Mapping(target = "bookTitle", source = "book.title")
     @Mapping(target = "bookAuthor", source = "book.author")
+    @Mapping(target = "bookCoverImageUrl", source = "book.coverImageUrl")
     BookShareResponseDto toResponseDto(BookShare bookShare);
 }

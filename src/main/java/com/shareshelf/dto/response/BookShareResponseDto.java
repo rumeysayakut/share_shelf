@@ -1,4 +1,3 @@
-
 package com.shareshelf.dto.response;
 
 import com.shareshelf.entity.BookShareStatus;
@@ -22,6 +21,7 @@ public class BookShareResponseDto {
     private Long bookId;
     private String bookTitle;
     private String bookAuthor;
+    private String bookCoverImageUrl;
 
     private ShareType shareType;
     private BookShareStatus status;
