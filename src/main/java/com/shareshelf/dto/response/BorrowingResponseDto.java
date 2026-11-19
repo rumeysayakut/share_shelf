@@ -34,4 +34,23 @@ public class BorrowingResponseDto {
     private LocalDateTime returnedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public String getStatusLabel() {
+
+        if (status == null) {
+            return "Beklemede";
+        }
+
+        return switch (status) {
+            case PENDING -> "Beklemede";
+            case ACCEPTED -> "Kabul Edildi";
+            case REJECTED -> "Reddedildi";
+            case CANCELLED -> "İptal Edildi";
+            case BORROWED -> "Kitap Teslim Alındı";
+            case RETURN_PENDING -> "İade Bekleniyor";
+            case RETURNED -> "İade Edildi";
+            case OVERDUE -> "İade Süresi Geçti";
+            case DISPUTED -> "İtirazlı İşlem";
+        };
+    }
 }

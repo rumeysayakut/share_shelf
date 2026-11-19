@@ -50,34 +50,30 @@ public class BorrowingController {
         return "redirect:/shares";
     }
 
-    @GetMapping("/requests")
-    public String incomingRequests(
+    @GetMapping({"", "/requests"})
+    public String borrowingRequests(
+            @RequestParam(defaultValue = "incoming") String view,
             @AuthenticationPrincipal User currentUser,
             Model model) {
 
-        model.addAttribute(
-                "requests",
-                borrowingService.getIncomingRequests(currentUser)
-        );
+        boolean sentView = "sent".equals(view);
 
+        if (sentView) {
+            model.addAttribute(
+                    "requests",
+                    borrowingService.getMyRequests(currentUser)
+            );
+        } else {
+            model.addAttribute(
+                    "requests",
+                    borrowingService.getIncomingRequests(currentUser)
+            );
+        }
+
+        model.addAttribute("view", sentView ? "sent" : "incoming");
         model.addAttribute("isAuthenticated", true);
 
-        return "borrowings/requests";
-    }
-
-    @GetMapping("/my-requests")
-    public String myRequests(
-            @AuthenticationPrincipal User currentUser,
-            Model model) {
-
-        model.addAttribute(
-                "requests",
-                borrowingService.getMyRequests(currentUser)
-        );
-
-        model.addAttribute("isAuthenticated", true);
-
-        return "borrowings/my-requests";
+        return "borrowings/index";
     }
 
     @PostMapping("/{borrowingId}/accept")
@@ -93,7 +89,7 @@ public class BorrowingController {
                 "İstek kabul edildi. Kitap rezerve edildi."
         );
 
-        return "redirect:/borrowings/requests";
+        return "redirect:/borrowings";
     }
 
     @PostMapping("/{borrowingId}/reject")
@@ -109,6 +105,6 @@ public class BorrowingController {
                 "Ödünç alma isteği reddedildi."
         );
 
-        return "redirect:/borrowings/requests";
+        return "redirect:/borrowings";
     }
 }

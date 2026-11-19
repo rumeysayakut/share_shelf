@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödünç İşlemleri - ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/shares.css}">
+    <style>
+        .borrowing-tabs {
+            display: flex;
+            gap: 12px;
+            margin: 30px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #EAE4DC;
+        }
+
+        .borrowing-tab {
+            padding: 12px 20px;
+            color: #62665F;
+            background: #F3EFEA;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .borrowing-tab.active {
+            color: #FFFFFF;
+            background: #1B4332;
+        }
+
+        .borrowing-status {
+            display: inline-block;
+            padding: 8px 12px;
+            margin-top: 12px;
+            color: #1B4332;
+            background: #EAF1EC;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .borrowing-date {
+            margin-top: 12px;
+            color: #85877F;
+            font-size: 12px;
+        }
+
+        .borrowing-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .borrowing-actions form {
+            margin: 0;
+        }
+
+        .borrowing-reject-button {
+            min-height: 47px;
+            padding: 0 24px;
+            color: #9B2C2C;
+            background: #FDECEC;
+            border: 1px solid #F5C6C6;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .borrowing-reject-button:hover {
+            background: #F8DADA;
+        }
+
+        @media (max-width: 500px) {
+            .borrowing-tabs {
+                gap: 8px;
+            }
+
+            .borrowing-tab {
+                flex: 1;
+                padding: 11px 8px;
+                text-align: center;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="shares-page">
+
+    <section class="shares-content">
+
+        <div class="shares-section-heading">
+            <div>
+                <span class="shares-eyebrow">KİTAP PAYLAŞIMLARIM</span>
+                <h1>Ödünç İşlemleri</h1>
+                <p>Kitap isteklerini ve gönderdiğin talepleri buradan takip edebilirsin.</p>
+            </div>
+        </div>
+
+        <div class="borrowing-tabs">
+
+            <a th:href="@{/borrowings(view='incoming')}"
+               th:classappend="${view == 'incoming'} ? ' active' : ''"
+               class="borrowing-tab">
+                Gelen İstekler
+            </a>
+
+            <a th:href="@{/borrowings(view='sent')}"
+               th:classappend="${view == 'sent'} ? ' active' : ''"
+               class="borrowing-tab">
+                Gönderdiğim İstekler
+            </a>
+
+        </div>
+
+        <div th:if="${successMessage != null}"
+             class="share-message share-message-success">
+            <p th:text="${successMessage}"></p>
+        </div>
+
+        <div th:if="${errorMessage != null}"
+             class="share-message share-message-error">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(requests)}" class="shares-empty">
+
+            <div class="shares-empty-icon">📚</div>
+
+            <div th:if="${view == 'incoming'}">
+                <h3>Henüz gelen bir istek yok</h3>
+                <p>Paylaştığın kitaplara gelen ödünç alma istekleri burada görünecek.</p>
+            </div>
+
+            <div th:if="${view == 'sent'}">
+                <h3>Henüz bir ödünç alma isteğin yok</h3>
+                <p>Başka kullanıcıların kitaplarına gönderdiğin istekleri burada takip edebilirsin.</p>
+                <a th:href="@{/shares}" class="shares-primary-button">
+                    Kitapları Keşfet
+                </a>
+            </div>
+
+        </div>
+
+        <div th:unless="${#lists.isEmpty(requests)}" class="shares-grid">
+
+            <article class="share-card" th:each="request : ${requests}">
+
+                <div class="share-card-body">
+
+                    <span class="shares-eyebrow"
+                          th:text="${view == 'incoming'} ? 'GELEN İSTEK' : 'GÖNDERİLEN İSTEK'">
+                        ÖDÜNÇ İSTEĞİ
+                    </span>
+
+                    <h3 th:text="${request.bookTitle}">Kitap adı</h3>
+
+                    <p th:if="${view == 'incoming'}">
+                        İstekte bulunan:
+                        <strong th:text="${request.borrowerFirstName + ' ' + request.borrowerLastName}">
+                            Kullanıcı
+                        </strong>
+                    </p>
+
+                    <p th:if="${view == 'sent'}">
+                        Kitap sahibi:
+                        <strong th:text="${request.ownerFirstName + ' ' + request.ownerLastName}">
+                            Kullanıcı
+                        </strong>
+                    </p>
+
+                    <span class="borrowing-status"
+                          th:text="${request.statusLabel}">
+                        Beklemede
+                    </span>
+
+                    <p class="borrowing-date"
+                       th:if="${request.requestedAt != null}"
+                       th:text="${'İstek tarihi: ' + #temporals.format(request.requestedAt, 'dd.MM.yyyy HH:mm')}">
+                    </p>
+
+                    <div class="borrowing-actions"
+                         th:if="${view == 'incoming' and request.status != null and request.status.name() == 'PENDING'}">
+
+                        <form th:action="@{/borrowings/{id}/accept(id=${request.id})}"
+                              method="post">
+                            <button type="submit" class="shares-primary-button">
+                                Kabul Et
+                            </button>
+                        </form>
+
+                        <form th:action="@{/borrowings/{id}/reject(id=${request.id})}"
+                              method="post">
+                            <button type="submit" class="borrowing-reject-button">
+                                Reddet
+                            </button>
+                        </form>
+
+                    </div>
+
+                    <div th:if="${view == 'sent' and request.status != null and request.status.name() == 'ACCEPTED'}">
+                        <p style="margin-top: 15px; color: #1B4332; font-size: 13px;">
+                            İsteğin kabul edildi. Artık kitap sahibiyle iletişim kurabilirsin.
+                        </p>
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="shares-footer">
+    <p>ShareShelf · Kitaplar paylaştıkça çoğalır.</p>
+</footer>
+
+<script th:src="@{/js/auth.js}" defer></script>
+
+</body>
+</html>
