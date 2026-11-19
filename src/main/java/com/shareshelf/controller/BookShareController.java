@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -144,6 +145,22 @@ public class BookShareController {
         shareRequest.setDescription(shareDescription);
 
         bookShareService.createShare(shareRequest, currentUser);
+
+        return "redirect:/shares";
+    }
+
+    @PostMapping("/{shareId}/close")
+    public String closeShare(
+            @PathVariable Long shareId,
+            @AuthenticationPrincipal User currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        bookShareService.closeShare(shareId, currentUser);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Kitap paylaşımın kaldırıldı."
+        );
 
         return "redirect:/shares";
     }

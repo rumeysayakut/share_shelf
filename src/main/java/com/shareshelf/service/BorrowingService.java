@@ -90,7 +90,10 @@ public class BorrowingService {
                 );
 
         if (existingRequest.isPresent()) {
-            return borrowingMapper.toResponseDto(existingRequest.get());
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Bu kitap için zaten aktif bir isteğiniz bulunuyor."
+            );
         }
 
         Borrowing borrowing = Borrowing.builder()

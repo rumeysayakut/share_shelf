@@ -81,4 +81,32 @@ public class BookShareService {
                 .map(bookShareMapper::toResponseDto)
                 .toList();
     }
+
+    @Transactional
+    public void closeShare(Long shareId, User currentUser) {
+
+        if (currentUser == null || currentUser.getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Bu işlem için giriş yapmalısınız."
+            );
+        }
+
+        BookShare bookShare = bookShareRepository
+                .findByIdAndUser_Id(shareId, currentUser.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Paylaşım bulunamadı veya bu işlem için yetkiniz yok."
+                ));
+
+        if (bookShare.getStatus() != BookShareStatus.ACTIVE) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Bu paylaşım şu anda kaldırılamaz."
+            );
+        }
+
+        bookShare.setStatus(BookShareStatus.CLOSED);
+        bookShareRepository.save(bookShare);
+    }
 }

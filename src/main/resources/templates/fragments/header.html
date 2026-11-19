@@ -8,6 +8,12 @@
 
             <a th:href="@{/shares}">Kitap Paylaşımı</a>
 
+            <a th:if="${isAuthenticated}"
+               th:href="@{/borrowings/requests}">Gelen İstekler</a>
+
+            <a th:if="${isAuthenticated}"
+               th:href="@{/borrowings/my-requests}">Gönderdiğim İstekler</a>
+
             <a th:if="${!isAuthenticated}" th:href="@{/login}">Giriş Yap</a>
 
             <a class="nav-register"

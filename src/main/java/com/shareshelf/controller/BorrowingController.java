@@ -1,3 +1,4 @@
+
 package com.shareshelf.controller;
 
 import com.shareshelf.entity.User;
@@ -62,6 +63,21 @@ public class BorrowingController {
         model.addAttribute("isAuthenticated", true);
 
         return "borrowings/requests";
+    }
+
+    @GetMapping("/my-requests")
+    public String myRequests(
+            @AuthenticationPrincipal User currentUser,
+            Model model) {
+
+        model.addAttribute(
+                "requests",
+                borrowingService.getMyRequests(currentUser)
+        );
+
+        model.addAttribute("isAuthenticated", true);
+
+        return "borrowings/my-requests";
     }
 
     @PostMapping("/{borrowingId}/accept")

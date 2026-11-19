@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 
@@ -111,6 +112,13 @@
                     <div class="share-action"
                          th:if="${isAuthenticated and currentUserId == share.userId}">
                         <p>Bu kitap senin paylaşımın.</p>
+
+                        <form th:action="@{/shares/{id}/close(id=${share.id})}"
+                              method="post">
+                            <button type="submit" class="shares-primary-button">
+                                Paylaşımı Kaldır
+                            </button>
+                        </form>
                     </div>
 
                     <div class="share-action" th:unless="${isAuthenticated}">

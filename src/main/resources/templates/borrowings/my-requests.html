@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gönderdiğim İstekler - ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/shares.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="shares-page">
+
+    <section class="shares-content">
+
+        <div class="shares-section-heading">
+            <div>
+                <span class="shares-eyebrow">ÖDÜNÇ ALMA İŞLEMLERİM</span>
+                <h1>Gönderdiğim İstekler</h1>
+                <p>Ödünç almak istediğin kitaplara gönderdiğin istekleri buradan takip edebilirsin.</p>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(requests)}" class="shares-empty">
+            <div class="shares-empty-icon">📚</div>
+            <h3>Henüz bir istek göndermedin</h3>
+            <p>Paylaşıma açılan kitapları keşfedebilir ve ödünç alma isteği gönderebilirsin.</p>
+            <a th:href="@{/shares}" class="shares-primary-button">
+                Kitapları Keşfet
+            </a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(requests)}" class="shares-grid">
+
+            <article class="share-card" th:each="request : ${requests}">
+
+                <div class="share-card-body">
+
+                    <span class="shares-eyebrow">ÖDÜNÇ ALMA İSTEĞİ</span>
+
+                    <h3 th:text="${request.bookTitle}">Kitap adı</h3>
+
+                    <p>
+                        Kitap sahibi:
+                        <strong th:text="${request.ownerFirstName + ' ' + request.ownerLastName}">
+                            Kitap sahibi
+                        </strong>
+                    </p>
+
+                    <p th:if="${request.requestedAt != null}">
+                        İstek tarihi:
+                        <strong th:text="${#temporals.format(request.requestedAt, 'dd.MM.yyyy HH:mm')}">
+                            İstek tarihi
+                        </strong>
+                    </p>
+
+                    <div class="share-condition">
+                        <span>İstek durumu</span>
+
+                        <p th:switch="${request.status}">
+                            <strong th:case="'PENDING'">Beklemede</strong>
+                            <strong th:case="'ACCEPTED'">Kabul edildi</strong>
+                            <strong th:case="'REJECTED'">Reddedildi</strong>
+                            <strong th:case="'CANCELLED'">İptal edildi</strong>
+                            <strong th:case="'BORROWED'">Ödünç alındı</strong>
+                            <strong th:case="'RETURN_PENDING'">İade talebi bekliyor</strong>
+                            <strong th:case="'RETURNED'">İade edildi</strong>
+                            <strong th:case="'OVERDUE'">İade süresi geçti</strong>
+                            <strong th:case="'DISPUTED'">İtirazlı</strong>
+                            <strong th:case="*">Bilinmeyen durum</strong>
+                        </p>
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="shares-footer">
+    <p>ShareShelf · Kitaplar paylaştıkça çoğalır.</p>
+</footer>
+
+<script th:src="@{/js/auth.js}" defer></script>
+
+</body>
+</html>
