@@ -465,3 +465,50 @@
         flex-direction: column;
     }
 }
+
+
+
+
+.share-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #EEEAE3;
+}
+
+.share-action form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.share-action .shares-primary-button {
+    min-width: 150px;
+    cursor: pointer;
+}
+
+.share-message {
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.share-message p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.share-message-success {
+    color: #1B4332;
+    background: #EAF1EC;
+    border: 1px solid #C8DDCE;
+}
+
+.share-message-error {
+    color: #9B2C2C;
+    background: #FDECEC;
+    border: 1px solid #F5C6C6;
+}

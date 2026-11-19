@@ -50,6 +50,10 @@ public class BookShareController {
 
         model.addAttribute("shares", bookShareService.getActiveShares());
         model.addAttribute("isAuthenticated", currentUser != null);
+        model.addAttribute(
+                "currentUserId",
+                currentUser != null ? currentUser.getId() : null
+        );
 
         return "shares/list";
     }

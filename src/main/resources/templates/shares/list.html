@@ -12,6 +12,7 @@
 <body>
 
 <div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
 <main class="shares-page">
 
     <section class="shares-hero">
@@ -30,6 +31,15 @@
     </section>
 
     <section class="shares-content">
+
+        <div th:if="${successMessage != null}" class="share-message share-message-success">
+            <p th:text="${successMessage}"></p>
+        </div>
+
+        <div th:if="${errorMessage != null}" class="share-message share-message-error">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
         <div class="shares-section-heading">
             <div>
                 <span class="shares-eyebrow">KEŞFET</span>
@@ -49,21 +59,28 @@
         </div>
 
         <div th:unless="${#lists.isEmpty(shares)}" class="shares-grid">
+
             <article class="share-card" th:each="share : ${shares}">
+
                 <div class="share-card-image">
                     <img th:if="${share.bookCoverImageUrl != null and !#strings.isEmpty(share.bookCoverImageUrl)}"
                          th:src="${share.bookCoverImageUrl}"
                          th:alt="${share.bookTitle}">
+
                     <div th:unless="${share.bookCoverImageUrl != null and !#strings.isEmpty(share.bookCoverImageUrl)}"
                          class="share-no-cover">📖</div>
+
                     <span class="share-type-label">Ücretsiz ödünç</span>
                 </div>
 
                 <div class="share-card-body">
+
                     <h3 th:text="${share.bookTitle}">Kitap adı</h3>
+
                     <p class="share-author" th:text="${share.bookAuthor}">Yazar</p>
 
-                    <div class="share-condition" th:if="${share.conditionDescription != null and !#strings.isEmpty(share.conditionDescription)}">
+                    <div class="share-condition"
+                         th:if="${share.conditionDescription != null and !#strings.isEmpty(share.conditionDescription)}">
                         <span>Kitap durumu</span>
                         <p th:text="${share.conditionDescription}"></p>
                     </div>
@@ -74,11 +91,39 @@
 
                     <div class="share-owner">
                         <span class="share-owner-avatar">👤</span>
-                        <span th:text="${share.userFirstName + ' ' + share.userLastName}">Kitap sahibi</span>
+                        <span th:text="${share.userFirstName + ' ' + share.userLastName}">
+                            Kitap sahibi
+                        </span>
                     </div>
+
+                    <div class="share-action"
+                         th:if="${isAuthenticated and currentUserId != share.userId}">
+
+                        <form th:action="@{/borrowings/shares/{id}/request(id=${share.id})}"
+                              method="post">
+                            <button type="submit" class="shares-primary-button">
+                                Ödünç Al
+                            </button>
+                        </form>
+
+                    </div>
+
+                    <div class="share-action"
+                         th:if="${isAuthenticated and currentUserId == share.userId}">
+                        <p>Bu kitap senin paylaşımın.</p>
+                    </div>
+
+                    <div class="share-action" th:unless="${isAuthenticated}">
+                        <a th:href="@{/login}" class="shares-primary-button">
+                            İstek Göndermek İçin Giriş Yap
+                        </a>
+                    </div>
+
                 </div>
             </article>
+
         </div>
+
     </section>
 
 </main>

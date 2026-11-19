@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödünç Alma İstekleri - ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/shares.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="shares-page">
+
+    <section class="shares-content">
+        <div class="shares-section-heading">
+            <div>
+                <span class="shares-eyebrow">KİTAP PAYLAŞIMLARIM</span>
+                <h1>Gelen Ödünç Alma İstekleri</h1>
+                <p>Kitaplarını ödünç almak isteyen kişilerin isteklerini buradan yönetebilirsin.</p>
+            </div>
+        </div>
+
+        <div th:if="${successMessage != null}" class="shares-empty">
+            <p th:text="${successMessage}"></p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(requests)}" class="shares-empty">
+            <div class="shares-empty-icon">📚</div>
+            <h3>Henüz gelen bir istek yok</h3>
+            <p>Paylaştığın kitaplara gelen ödünç alma istekleri burada görünecek.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(requests)}" class="shares-grid">
+
+            <article class="share-card" th:each="request : ${requests}">
+
+                <div class="share-card-body">
+                    <span class="shares-eyebrow">ÖDÜNÇ ALMA İSTEĞİ</span>
+
+                    <h3 th:text="${request.bookTitle}">Kitap adı</h3>
+
+                    <p>
+                        İstekte bulunan:
+                        <strong th:text="${request.borrowerFirstName + ' ' + request.borrowerLastName}">
+                            Kullanıcı
+                        </strong>
+                    </p>
+
+                    <p th:if="${request.requestedAt != null}"
+                       th:text="${#temporals.format(request.requestedAt, 'dd.MM.yyyy HH:mm')}">
+                    </p>
+
+                    <div style="display: flex; gap: 10px; margin-top: 18px;">
+
+                        <form th:action="@{/borrowings/{id}/accept(id=${request.id})}"
+                              method="post">
+                            <button type="submit" class="shares-primary-button">
+                                Kabul Et
+                            </button>
+                        </form>
+
+                        <form th:action="@{/borrowings/{id}/reject(id=${request.id})}"
+                              method="post">
+                            <button type="submit" class="shares-primary-button">
+                                Reddet
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </article>
+
+        </div>
+    </section>
+
+</main>
+
+<footer class="shares-footer">
+    <p>ShareShelf · Kitaplar paylaştıkça çoğalır.</p>
+</footer>
+
+<script th:src="@{/js/auth.js}" defer></script>
+
+</body>
+</html>
