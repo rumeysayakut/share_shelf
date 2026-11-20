@@ -38,6 +38,11 @@ public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
             BorrowingStatus status
     );
 
+    List<Borrowing> findAllByBookShare_User_IdAndStatusInOrderByRequestedAtDesc(
+            Long ownerId,
+            Collection<BorrowingStatus> statuses
+    );
+
     List<Borrowing> findAllByBorrower_IdOrderByRequestedAtDesc(
             Long borrowerId
     );

@@ -40,6 +40,16 @@ public class BorrowingService {
             BorrowingStatus.DISPUTED
     );
 
+    private final List<BorrowingStatus> incomingStatuses = List.of(
+            BorrowingStatus.PENDING,
+            BorrowingStatus.ACCEPTED,
+            BorrowingStatus.BORROWED,
+            BorrowingStatus.RETURN_PENDING,
+            BorrowingStatus.RETURNED,
+            BorrowingStatus.OVERDUE,
+            BorrowingStatus.DISPUTED
+    );
+
     public BorrowingService(
             BorrowingRepository borrowingRepository,
             BookShareRepository bookShareRepository,
@@ -231,9 +241,9 @@ public class BorrowingService {
         }
 
         return borrowingRepository
-                .findAllByBookShare_User_IdAndStatusOrderByRequestedAtDesc(
+                .findAllByBookShare_User_IdAndStatusInOrderByRequestedAtDesc(
                         currentUser.getId(),
-                        BorrowingStatus.PENDING
+                        incomingStatuses
                 )
                 .stream()
                 .map(borrowingMapper::toResponseDto)
