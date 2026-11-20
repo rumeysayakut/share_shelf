@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sohbet - ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <style>
+        .conversation-page {
+            width: min(900px, calc(100% - 32px));
+            margin: 45px auto 70px;
+        }
+
+        .conversation-heading {
+            margin-bottom: 25px;
+        }
+
+        .conversation-heading a {
+            color: #1B4332;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .conversation-heading h1 {
+            margin: 18px 0 7px;
+            color: #1B4332;
+            font-size: 27px;
+        }
+
+        .conversation-heading p {
+            margin: 0;
+            color: #77736D;
+            font-size: 14px;
+        }
+
+        .conversation-card {
+            overflow: hidden;
+            border: 1px solid #E9E2D9;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 8px 25px rgba(31, 41, 55, 0.05);
+        }
+
+        .conversation-user {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 20px 24px;
+            border-bottom: 1px solid #EEE9E2;
+            background: #F8F6F1;
+        }
+
+        .conversation-avatar {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #1B4332;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .conversation-user strong {
+            display: block;
+            color: #1B4332;
+            font-size: 14px;
+        }
+
+        .conversation-user span {
+            display: block;
+            margin-top: 5px;
+            color: #85877F;
+            font-size: 12px;
+        }
+
+        .conversation-messages {
+            min-height: 350px;
+            max-height: 550px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 25px;
+            background: #FDFBF7;
+        }
+
+        .conversation-empty {
+            margin: auto;
+            color: #85877F;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .message-row {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .message-row.own {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            max-width: min(75%, 520px);
+            padding: 12px 16px;
+            border-radius: 13px 13px 13px 3px;
+            background: #F0EDE7;
+            color: #333A34;
+            overflow-wrap: anywhere;
+        }
+
+        .message-row.own .message-bubble {
+            border-radius: 13px 13px 3px 13px;
+            background: #1B4332;
+            color: white;
+        }
+
+        .message-sender {
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .message-content {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .message-time {
+            margin-top: 7px;
+            color: #85877F;
+            font-size: 10px;
+            text-align: right;
+        }
+
+        .message-row.own .message-time {
+            color: #DCE9DF;
+        }
+
+        .conversation-form {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 18px;
+            border-top: 1px solid #EEE9E2;
+            background: white;
+        }
+
+        .conversation-form textarea {
+            flex: 1;
+            min-height: 48px;
+            max-height: 130px;
+            resize: vertical;
+            padding: 13px 15px;
+            border: 1px solid #E3DCD2;
+            border-radius: 10px;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .conversation-form textarea:focus {
+            border-color: #1B4332;
+        }
+
+        .conversation-form button {
+            min-height: 48px;
+            padding: 0 23px;
+            border: none;
+            border-radius: 9px;
+            background: #1B4332;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .conversation-form button:hover {
+            background: #24563F;
+        }
+
+        @media (max-width: 550px) {
+            .conversation-page {
+                margin-top: 25px;
+            }
+
+            .conversation-heading h1 {
+                font-size: 23px;
+            }
+
+            .conversation-messages {
+                min-height: 300px;
+                padding: 16px;
+            }
+
+            .message-bubble {
+                max-width: 88%;
+            }
+
+            .conversation-form {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .conversation-form button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="conversation-page">
+
+    <div class="conversation-heading">
+        <a th:href="@{/borrowings}">← Ödünç İşlemlerine Dön</a>
+
+        <h1 th:text="${conversation.bookShare.book.title}">
+            Kitap adı
+        </h1>
+
+        <p>Kitap paylaşımı hakkında iletişim kurabilirsin.</p>
+    </div>
+
+    <section class="conversation-card">
+
+        <div class="conversation-user">
+
+            <div class="conversation-avatar">
+                <span th:text="${#strings.substring(
+                    conversation.userOne.id == currentUserId
+                    ? conversation.userTwo.firstName
+                    : conversation.userOne.firstName, 0, 1)}">K</span>
+            </div>
+
+            <div>
+                <strong th:if="${conversation.userOne.id == currentUserId}"
+                        th:text="${conversation.userTwo.firstName + ' ' + conversation.userTwo.lastName}">
+                    Kullanıcı
+                </strong>
+
+                <strong th:unless="${conversation.userOne.id == currentUserId}"
+                        th:text="${conversation.userOne.firstName + ' ' + conversation.userOne.lastName}">
+                    Kullanıcı
+                </strong>
+
+                <span>ShareShelf sohbeti</span>
+            </div>
+
+        </div>
+
+        <div class="conversation-messages" id="conversationMessages">
+
+            <div class="conversation-empty" th:if="${#lists.isEmpty(messages)}">
+                Henüz mesaj yok. İlk mesajı sen gönderebilirsin.
+            </div>
+
+            <div th:each="message : ${messages}"
+                 class="message-row"
+                 th:classappend="${message.sender.id == currentUserId} ? ' own' : ''">
+
+                <div class="message-bubble">
+
+                    <div class="message-sender"
+                         th:text="${message.sender.firstName}">
+                        Kullanıcı
+                    </div>
+
+                    <p class="message-content"
+                       th:text="${message.content}">
+                        Mesaj içeriği
+                    </p>
+
+                    <div class="message-time"
+                         th:if="${message.sentAt != null}"
+                         th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <form class="conversation-form"
+              th:action="@{/conversations/{id}/messages(id=${conversation.id})}"
+              method="post">
+
+            <textarea name="content"
+                      maxlength="5000"
+                      placeholder="Mesajını yaz..."
+                      required></textarea>
+
+            <button type="submit">Gönder</button>
+
+        </form>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/auth.js}" defer></script>
+
+<script>
+    const messagesContainer = document.getElementById("conversationMessages");
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+</script>
+
+</body>
+</html>

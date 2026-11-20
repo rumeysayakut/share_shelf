@@ -1,4 +1,3 @@
-
 package com.shareshelf.entity;
 
 import jakarta.persistence.*;
@@ -18,6 +17,10 @@ public class Conversation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "borrowing_id", unique = true)
+    private Borrowing borrowing;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_share_id", nullable = false)

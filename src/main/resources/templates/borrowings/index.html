@@ -76,6 +76,25 @@
             background: #F8DADA;
         }
 
+        .conversation-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 47px;
+            padding: 0 24px;
+            color: #FFFFFF;
+            background: #1B4332;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+
+        .conversation-button:hover {
+            background: #2D6048;
+        }
+
         @media (max-width: 500px) {
             .borrowing-tabs {
                 gap: 8px;
@@ -212,6 +231,16 @@
                         <p style="margin-top: 15px; color: #1B4332; font-size: 13px;">
                             İsteğin kabul edildi. Artık kitap sahibiyle iletişim kurabilirsin.
                         </p>
+                    </div>
+
+                    <div class="borrowing-actions"
+                         th:if="${request.status != null and (request.status.name() == 'ACCEPTED' or request.status.name() == 'BORROWED' or request.status.name() == 'RETURN_PENDING' or request.status.name() == 'RETURNED' or request.status.name() == 'OVERDUE' or request.status.name() == 'DISPUTED')}">
+
+                        <a th:href="@{/conversations/borrowing/{id}(id=${request.id})}"
+                           class="conversation-button">
+                            Sohbete Git
+                        </a>
+
                     </div>
 
                 </div>
