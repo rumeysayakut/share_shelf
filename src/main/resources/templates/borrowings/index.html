@@ -11,6 +11,7 @@
     <style>
         .borrowing-tabs {
             display: flex;
+            flex-wrap: wrap;
             gap: 12px;
             margin: 30px 0;
             padding-bottom: 15px;
@@ -30,6 +31,14 @@
         .borrowing-tab.active {
             color: #FFFFFF;
             background: #1B4332;
+        }
+
+        .borrowing-tab:hover {
+            background: #E8E3DB;
+        }
+
+        .borrowing-tab.active:hover {
+            background: #24563F;
         }
 
         .borrowing-status {
@@ -95,7 +104,7 @@
             background: #2D6048;
         }
 
-        @media (max-width: 500px) {
+        @media (max-width: 600px) {
             .borrowing-tabs {
                 gap: 8px;
             }
@@ -138,6 +147,11 @@
                th:classappend="${view == 'sent'} ? ' active' : ''"
                class="borrowing-tab">
                 Gönderdiğim İstekler
+            </a>
+
+            <a th:href="@{/conversations}"
+               class="borrowing-tab">
+                Mesajlarım
             </a>
 
         </div>

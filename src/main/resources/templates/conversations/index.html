@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesajlarım - ShareShelf</title>
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+    <link rel="stylesheet" th:href="@{/css/shares.css}">
+    <style>
+        .messages-page {
+            width: min(950px, calc(100% - 32px));
+            margin: 45px auto 70px;
+        }
+
+        .messages-heading {
+            margin-bottom: 30px;
+        }
+
+        .messages-heading span {
+            color: #D97706;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .messages-heading h1 {
+            margin: 10px 0;
+            color: #1B4332;
+            font-size: 30px;
+        }
+
+        .messages-heading p {
+            color: #77736D;
+            font-size: 14px;
+        }
+
+        .conversation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 22px;
+            border: 1px solid #E9E2D9;
+            border-radius: 14px;
+            background: #FFFFFF;
+            box-shadow: 0 5px 18px rgba(31, 41, 55, 0.04);
+        }
+
+        .conversation-info h3 {
+            margin: 0 0 9px;
+            color: #1B4332;
+            font-size: 17px;
+        }
+
+        .conversation-info p {
+            margin: 5px 0;
+            color: #77736D;
+            font-size: 13px;
+        }
+
+        .conversation-person {
+            color: #333A34 !important;
+            font-weight: 700;
+        }
+
+        .conversation-date {
+            margin-top: 10px !important;
+            color: #99958D !important;
+            font-size: 11px !important;
+        }
+
+        .conversation-open {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 43px;
+            padding: 0 20px;
+            border-radius: 9px;
+            background: #1B4332;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .conversation-open:hover {
+            background: #2D6048;
+        }
+
+        .messages-empty {
+            padding: 65px 25px;
+            border: 1px dashed #DCD4C9;
+            border-radius: 15px;
+            background: #FFFFFF;
+            text-align: center;
+        }
+
+        .messages-empty-icon {
+            margin-bottom: 15px;
+            font-size: 40px;
+        }
+
+        .messages-empty h3 {
+            color: #1B4332;
+            font-size: 18px;
+        }
+
+        .messages-empty p {
+            color: #77736D;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .conversation-item {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .conversation-open {
+                width: 100%;
+            }
+
+            .messages-heading h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
+
+<main class="messages-page">
+
+    <div class="messages-heading">
+        <span>SHARESHELF İLETİŞİM</span>
+        <h1>Mesajlarım</h1>
+        <p>Kitap paylaşımı yaptığın kullanıcılarla olan sohbetlerini buradan takip edebilirsin.</p>
+    </div>
+
+    <div class="messages-empty" th:if="${#lists.isEmpty(conversations)}">
+        <div class="messages-empty-icon">💬</div>
+        <h3>Henüz bir sohbetin bulunmuyor</h3>
+        <p>Kabul edilen ödünç alma isteklerinden sohbet başlatabilirsin.</p>
+        <a th:href="@{/borrowings}"
+           class="conversation-open"
+           style="margin-top: 15px;">
+            Ödünç İşlemlerine Git
+        </a>
+    </div>
+
+    <div class="conversation-list" th:unless="${#lists.isEmpty(conversations)}">
+
+        <article class="conversation-item" th:each="conversation : ${conversations}">
+
+            <div class="conversation-info">
+
+                <h3 th:text="${conversation.bookShare.book.title}">
+                    Kitap adı
+                </h3>
+
+                <p class="conversation-person"
+                   th:if="${conversation.userOne.id == currentUserId}"
+                   th:text="${conversation.userTwo.firstName + ' ' + conversation.userTwo.lastName}">
+                    Kullanıcı
+                </p>
+
+                <p class="conversation-person"
+                   th:unless="${conversation.userOne.id == currentUserId}"
+                   th:text="${conversation.userOne.firstName + ' ' + conversation.userOne.lastName}">
+                    Kullanıcı
+                </p>
+
+                <p>Kitap paylaşımı sohbeti</p>
+
+                <p class="conversation-date"
+                   th:if="${conversation.updatedAt != null}"
+                   th:text="${'Son hareket: ' + #temporals.format(conversation.updatedAt, 'dd.MM.yyyy HH:mm')}">
+                </p>
+
+            </div>
+
+            <a class="conversation-open"
+               th:href="@{/conversations/borrowing/{id}(id=${conversation.borrowing.id})}">
+                Sohbete Git
+            </a>
+
+        </article>
+
+    </div>
+
+</main>
+
+<script th:src="@{/js/auth.js}" defer></script>
+
+</body>
+</html>

@@ -1,3 +1,4 @@
+
 package com.shareshelf.service;
 
 import com.shareshelf.entity.*;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,10 +30,7 @@ public class ConversationService {
     }
 
     @Transactional
-    public Conversation getOrCreateConversation(
-            Long borrowingId,
-            User currentUser) {
-
+    public Conversation getOrCreateConversation(Long borrowingId, User currentUser) {
         validateUser(currentUser);
 
         Borrowing borrowing = borrowingRepository.findById(borrowingId)
@@ -72,10 +71,13 @@ public class ConversationService {
     }
 
     @Transactional
-    public Conversation getAccessibleConversation(
-            Long conversationId,
-            User currentUser) {
+    public List<Conversation> getUserConversations(User currentUser) {
+        validateUser(currentUser);
+        return conversationRepository.findAllByParticipantId(currentUser.getId());
+    }
 
+    @Transactional
+    public Conversation getAccessibleConversation(Long conversationId, User currentUser) {
         validateUser(currentUser);
 
         Conversation conversation = conversationRepository.findById(conversationId)
@@ -101,16 +103,11 @@ public class ConversationService {
     @Transactional
     public List<Message> getMessages(Long conversationId, User currentUser) {
         getAccessibleConversation(conversationId, currentUser);
-
         return messageRepository.findMessagesByConversationId(conversationId);
     }
 
     @Transactional
-    public void sendMessage(
-            Long conversationId,
-            String content,
-            User currentUser) {
-
+    public void sendMessage(Long conversationId, String content, User currentUser) {
         if (content == null || content.isBlank()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -125,8 +122,7 @@ public class ConversationService {
             );
         }
 
-        Conversation conversation =
-                getAccessibleConversation(conversationId, currentUser);
+        Conversation conversation = getAccessibleConversation(conversationId, currentUser);
 
         Message message = Message.builder()
                 .conversation(conversation)
@@ -135,6 +131,9 @@ public class ConversationService {
                 .build();
 
         messageRepository.save(message);
+
+        conversation.setUpdatedAt(LocalDateTime.now());
+        conversationRepository.save(conversation);
     }
 
     private boolean isConversationAllowed(BorrowingStatus status) {

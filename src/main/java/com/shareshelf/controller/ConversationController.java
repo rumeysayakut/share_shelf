@@ -1,3 +1,4 @@
+
 package com.shareshelf.controller;
 
 import com.shareshelf.entity.Conversation;
@@ -18,25 +19,37 @@ public class ConversationController {
         this.conversationService = conversationService;
     }
 
+    @GetMapping
+    public String listConversations(
+            @AuthenticationPrincipal User currentUser,
+            Model model) {
+
+        model.addAttribute(
+                "conversations",
+                conversationService.getUserConversations(currentUser)
+        );
+
+        model.addAttribute("currentUserId", currentUser.getId());
+        model.addAttribute("isAuthenticated", true);
+
+        return "conversations/index";
+    }
+
     @GetMapping("/borrowing/{borrowingId}")
     public String showConversation(
             @PathVariable Long borrowingId,
             @AuthenticationPrincipal User currentUser,
             Model model) {
 
-        Conversation conversation =
-                conversationService.getOrCreateConversation(
-                        borrowingId,
-                        currentUser
-                );
+        Conversation conversation = conversationService.getOrCreateConversation(
+                borrowingId,
+                currentUser
+        );
 
         model.addAttribute("conversation", conversation);
         model.addAttribute(
                 "messages",
-                conversationService.getMessages(
-                        conversation.getId(),
-                        currentUser
-                )
+                conversationService.getMessages(conversation.getId(), currentUser)
         );
         model.addAttribute("currentUserId", currentUser.getId());
         model.addAttribute("isAuthenticated", true);
@@ -56,11 +69,10 @@ public class ConversationController {
                 currentUser
         );
 
-        Conversation conversation =
-                conversationService.getAccessibleConversation(
-                        conversationId,
-                        currentUser
-                );
+        Conversation conversation = conversationService.getAccessibleConversation(
+                conversationId,
+                currentUser
+        );
 
         return "redirect:/conversations/borrowing/" +
                 conversation.getBorrowing().getId();
