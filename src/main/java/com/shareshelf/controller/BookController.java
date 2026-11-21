@@ -41,11 +41,23 @@ public class BookController {
     @GetMapping("/{id}")
     public String getBookById(
             @PathVariable Long id,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String view,
             Model model,
             @AuthenticationPrincipal User currentUser) {
 
         model.addAttribute("book", bookService.getBookById(id));
         model.addAttribute("isAuthenticated", currentUser != null);
+
+        String returnUrl = "/books";
+
+        if ("shares".equals(from)) {
+            returnUrl = "mine".equals(view)
+                    ? "/shares?view=mine"
+                    : "/shares";
+        }
+
+        model.addAttribute("returnUrl", returnUrl);
 
         return "books/detail";
     }

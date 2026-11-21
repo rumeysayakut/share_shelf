@@ -1,0 +1,130 @@
+.shares-tabs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 18px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #EAE4DC;
+}
+
+.shares-tabs a {
+    padding: 12px 20px;
+    color: #62665F;
+    background: #F3EFEA;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.shares-tabs a:hover {
+    color: #1B4332;
+    background: #EAF1EC;
+}
+
+.shares-tabs a.active {
+    color: #FFFFFF;
+    background: #1B4332;
+}
+
+.shares-toolbar {
+    margin-bottom: 28px;
+}
+
+.shares-toolbar .shares-section-heading {
+    margin-bottom: 22px;
+}
+
+.shares-search {
+    width: 100%;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 18px;
+    background: #FFFFFF;
+    border: 1px solid #E4E2DA;
+    border-radius: 11px;
+    box-shadow: 0 5px 18px rgba(31, 41, 55, 0.04);
+}
+
+.shares-search span {
+    color: #1B4332;
+    font-size: 25px;
+    line-height: 1;
+}
+
+.shares-search input {
+    width: 100%;
+    min-width: 0;
+    height: 52px;
+    color: #1F2937;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.shares-search input::placeholder {
+    color: #969B93;
+}
+
+.share-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.share-card-link:hover h3 {
+    color: #1B4332;
+}
+
+.share-card-link h3 {
+    transition: color 0.2s;
+}
+
+.share-card-extra {
+    padding: 0 21px 21px;
+}
+
+.share-card-extra .share-owner {
+    margin-top: 0;
+}
+
+.share-card-extra .share-action {
+    margin-top: 18px;
+}
+
+.share-card[hidden],
+.shares-grid[hidden],
+.shares-search-empty[hidden] {
+    display: none !important;
+}
+
+.shares-search-empty {
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+    .shares-tabs {
+        gap: 8px;
+    }
+
+    .shares-tabs a {
+        flex: 1;
+        padding: 12px 8px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .shares-search {
+        min-height: 50px;
+        padding: 0 13px;
+    }
+
+    .shares-search input {
+        height: 48px;
+        font-size: 13px;
+    }
+}

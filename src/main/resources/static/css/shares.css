@@ -512,3 +512,48 @@
     background: #FDECEC;
     border: 1px solid #F5C6C6;
 }
+
+
+
+.shares-tabs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 20px;
+    margin-bottom: 35px;
+    border-bottom: 1px solid #EAE4DC;
+}
+
+.shares-tabs a {
+    padding: 13px 22px;
+    color: #69716A;
+    background: #F3EFEA;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.shares-tabs a:hover {
+    color: #1B4332;
+    background: #EAF1EC;
+}
+
+.shares-tabs a.active {
+    color: #FFFFFF;
+    background: #1B4332;
+}
+
+@media (max-width: 600px) {
+    .shares-tabs {
+        gap: 8px;
+    }
+
+    .shares-tabs a {
+        flex: 1;
+        padding: 12px 8px;
+        font-size: 12px;
+        text-align: center;
+    }
+}

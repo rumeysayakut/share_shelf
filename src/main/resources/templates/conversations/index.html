@@ -36,6 +36,38 @@
             font-size: 14px;
         }
 
+        .borrowing-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 30px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #EAE4DC;
+        }
+
+        .borrowing-tab {
+            padding: 12px 20px;
+            color: #62665F;
+            background: #F3EFEA;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .borrowing-tab.active {
+            color: #FFFFFF;
+            background: #1B4332;
+        }
+
+        .borrowing-tab:hover {
+            background: #E8E3DB;
+        }
+
+        .borrowing-tab.active:hover {
+            background: #24563F;
+        }
+
         .conversation-list {
             display: flex;
             flex-direction: column;
@@ -120,6 +152,17 @@
         }
 
         @media (max-width: 600px) {
+            .borrowing-tabs {
+                gap: 8px;
+            }
+
+            .borrowing-tab {
+                flex: 1;
+                padding: 11px 8px;
+                text-align: center;
+                font-size: 12px;
+            }
+
             .conversation-item {
                 align-items: flex-start;
                 flex-direction: column;
@@ -146,6 +189,25 @@
         <span>SHARESHELF İLETİŞİM</span>
         <h1>Mesajlarım</h1>
         <p>Kitap paylaşımı yaptığın kullanıcılarla olan sohbetlerini buradan takip edebilirsin.</p>
+    </div>
+
+    <div class="borrowing-tabs">
+
+        <a th:href="@{/borrowings(view='incoming')}"
+           class="borrowing-tab">
+            Gelen İstekler
+        </a>
+
+        <a th:href="@{/borrowings(view='sent')}"
+           class="borrowing-tab">
+            Gönderdiğim İstekler
+        </a>
+
+        <a th:href="@{/conversations}"
+           class="borrowing-tab active">
+            Mesajlarım
+        </a>
+
     </div>
 
     <div class="messages-empty" th:if="${#lists.isEmpty(conversations)}">

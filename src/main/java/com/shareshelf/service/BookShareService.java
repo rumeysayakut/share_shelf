@@ -1,4 +1,3 @@
-
 package com.shareshelf.service;
 
 import com.shareshelf.dto.request.BookShareRequestDto;
@@ -78,6 +77,17 @@ public class BookShareService {
                 .stream()
                 .filter(share -> share.getStatus() == BookShareStatus.ACTIVE)
                 .filter(share -> share.getShareType() == ShareType.LOAN)
+                .map(bookShareMapper::toResponseDto)
+                .toList();
+    }
+
+    public List<BookShareResponseDto> getActiveSharesByUserId(Long userId) {
+        return bookShareRepository.findAll()
+                .stream()
+                .filter(share -> share.getStatus() == BookShareStatus.ACTIVE)
+                .filter(share -> share.getShareType() == ShareType.LOAN)
+                .filter(share -> share.getUser() != null)
+                .filter(share -> share.getUser().getId().equals(userId))
                 .map(bookShareMapper::toResponseDto)
                 .toList();
     }

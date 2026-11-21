@@ -1,4 +1,3 @@
-
 package com.shareshelf.controller;
 
 import com.shareshelf.dto.request.BookRequestDto;
@@ -47,15 +46,24 @@ public class BookShareController {
 
     @GetMapping
     public String getActiveShares(
+            @RequestParam(defaultValue = "discover") String view,
             Model model,
             @AuthenticationPrincipal User currentUser) {
 
-        model.addAttribute("shares", bookShareService.getActiveShares());
-        model.addAttribute("isAuthenticated", currentUser != null);
+        boolean authenticated = currentUser != null;
+        boolean mySharesView = "mine".equals(view) && authenticated;
+
+        model.addAttribute("shares",
+                mySharesView
+                        ? bookShareService.getActiveSharesByUserId(currentUser.getId())
+                        : bookShareService.getActiveShares());
+
+        model.addAttribute("isAuthenticated", authenticated);
         model.addAttribute(
                 "currentUserId",
-                currentUser != null ? currentUser.getId() : null
+                authenticated ? currentUser.getId() : null
         );
+        model.addAttribute("activeView", mySharesView ? "mine" : "discover");
 
         return "shares/list";
     }
@@ -64,14 +72,11 @@ public class BookShareController {
     public String showCreateShareForm(
             Model model,
             @AuthenticationPrincipal User currentUser) {
-
         List<UserLibrary> userBooks =
                 userLibraryRepository.findAllByUserId(currentUser.getId());
-
         model.addAttribute("userBooks", userBooks);
         model.addAttribute("shareRequest", new BookShareRequestDto());
         model.addAttribute("isAuthenticated", true);
-
         return "shares/create";
     }
 
@@ -79,37 +84,30 @@ public class BookShareController {
     public String createShare(
             @ModelAttribute("shareRequest") BookShareRequestDto request,
             @AuthenticationPrincipal User currentUser) {
-
         if (request.getBookId() == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Lütfen bir kitap seçin."
             );
         }
-
         boolean ownsBook = userLibraryRepository.existsByUserIdAndBookId(
                 currentUser.getId(),
                 request.getBookId()
         );
-
         if (!ownsBook) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "Yalnızca kendi kitaplığınızdaki kitapları paylaşabilirsiniz."
             );
         }
-
         bookShareService.createShare(request, currentUser);
-
         return "redirect:/shares";
     }
 
     @GetMapping("/new-book")
     public String showNewBookForm(Model model) {
-
         model.addAttribute("bookRequest", new BookRequestDto());
         model.addAttribute("isAuthenticated", true);
-
         return "shares/create-book";
     }
 
@@ -122,32 +120,23 @@ public class BookShareController {
             @RequestParam(required = false) MultipartFile coverImage,
             @AuthenticationPrincipal User currentUser,
             Model model) {
-
         if (bindingResult.hasErrors()) {
             model.addAttribute("isAuthenticated", true);
             return "shares/create-book";
         }
-
         BookResponseDto savedBook =
                 bookService.createBook(bookRequest, currentUser, coverImage);
-
         UserLibraryRequestDto libraryRequest =
                 new UserLibraryRequestDto();
-
         libraryRequest.setBookId(savedBook.getId());
         libraryRequest.setReadingStatus(ReadingStatus.WANT_TO_READ);
-
         userLibraryService.addBook(libraryRequest, currentUser);
-
         BookShareRequestDto shareRequest =
                 new BookShareRequestDto();
-
         shareRequest.setBookId(savedBook.getId());
         shareRequest.setConditionDescription(conditionDescription);
         shareRequest.setDescription(shareDescription);
-
         bookShareService.createShare(shareRequest, currentUser);
-
         return "redirect:/shares";
     }
 
@@ -156,14 +145,11 @@ public class BookShareController {
             @PathVariable Long shareId,
             @AuthenticationPrincipal User currentUser,
             RedirectAttributes redirectAttributes) {
-
         bookShareService.closeShare(shareId, currentUser);
-
         redirectAttributes.addFlashAttribute(
                 "successMessage",
                 "Kitap paylaşımın kaldırıldı."
         );
-
-        return "redirect:/shares";
+        return "redirect:/shares?view=mine";
     }
 }

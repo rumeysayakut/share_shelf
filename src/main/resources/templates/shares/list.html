@@ -8,6 +8,7 @@
     <title>Kitap Paylaşımları - ShareShelf</title>
     <link rel="stylesheet" th:href="@{/css/books.css}">
     <link rel="stylesheet" th:href="@{/css/shares.css}">
+    <link rel="stylesheet" th:href="@{/css/shares-enhancements.css}">
 </head>
 
 <body>
@@ -41,44 +42,101 @@
             <p th:text="${errorMessage}"></p>
         </div>
 
+        <div class="shares-tabs">
+            <a th:href="@{/shares}"
+               th:classappend="${activeView == 'discover'} ? ' active' : ''">
+                Kitapları Keşfet
+            </a>
+
+            <a th:if="${isAuthenticated}"
+               th:href="@{/shares(view='mine')}"
+               th:classappend="${activeView == 'mine'} ? ' active' : ''">
+                Paylaştığım Kitaplar
+            </a>
+        </div>
+
         <div class="shares-section-heading">
             <div>
-                <span class="shares-eyebrow">KEŞFET</span>
-                <h2>Ödünç Alabileceğin Kitaplar</h2>
-                <p>Diğer okuyucuların paylaşımına açtığı kitaplara göz at.</p>
+                <span class="shares-eyebrow"
+                      th:text="${activeView == 'mine'} ? 'KİTAPLARIM' : 'KEŞFET'">
+                    KEŞFET
+                </span>
+
+                <h2 th:text="${activeView == 'mine'} ? 'Paylaştığım Kitaplar' : 'Ödünç Alabileceğin Kitaplar'">
+                    Ödünç Alabileceğin Kitaplar
+                </h2>
+
+                <p th:if="${activeView == 'mine'}">
+                    Paylaşıma açtığın kitapları buradan görüntüleyebilirsin.
+                </p>
+
+                <p th:unless="${activeView == 'mine'}">
+                    Diğer okuyucuların paylaşımına açtığı kitaplara göz at.
+                </p>
             </div>
+
             <span class="shares-count" th:text="${shares.size() + ' kitap'}">0 kitap</span>
+        </div>
+
+        <div class="shares-search" th:unless="${#lists.isEmpty(shares)}">
+            <input type="search"
+                   id="shareSearch"
+                   placeholder="Kitap adı, yazar veya paylaşan kişi ara..."
+                   autocomplete="off">
         </div>
 
         <div th:if="${#lists.isEmpty(shares)}" class="shares-empty">
             <div class="shares-empty-icon">📚</div>
-            <h3>Henüz paylaşılmış kitap yok</h3>
-            <p>İlk kitabı sen paylaşarak ShareShelf topluluğunu başlatabilirsin.</p>
-            <a th:if="${isAuthenticated}" th:href="@{/shares/new}" class="shares-primary-button">
+
+            <h3 th:if="${activeView == 'mine'}">Henüz kitap paylaşmadın</h3>
+            <h3 th:unless="${activeView == 'mine'}">Henüz paylaşılmış kitap yok</h3>
+
+            <p th:if="${activeView == 'mine'}">
+                İlk kitabını paylaşarak ShareShelf topluluğuna katkıda bulunabilirsin.
+            </p>
+
+            <p th:unless="${activeView == 'mine'}">
+                İlk kitabı sen paylaşarak ShareShelf topluluğunu başlatabilirsin.
+            </p>
+
+            <a th:if="${isAuthenticated}"
+               th:href="@{/shares/new}"
+               class="shares-primary-button">
                 İlk Kitabımı Paylaş
             </a>
         </div>
 
-        <div th:unless="${#lists.isEmpty(shares)}" class="shares-grid">
+        <div th:unless="${#lists.isEmpty(shares)}"
+             class="shares-grid"
+             id="sharesGrid">
 
-            <article class="share-card" th:each="share : ${shares}">
+            <article class="share-card"
+                     th:each="share : ${shares}"
+                     th:attr="data-search=${share.bookTitle + ' ' + share.bookAuthor + ' ' + share.userFirstName + ' ' + share.userLastName}">
 
-                <div class="share-card-image">
-                    <img th:if="${share.bookCoverImageUrl != null and !#strings.isEmpty(share.bookCoverImageUrl)}"
-                         th:src="${share.bookCoverImageUrl}"
-                         th:alt="${share.bookTitle}">
+                <a class="share-card-link"
+                   th:href="@{/books/{id}(id=${share.bookId},from='shares',view=${activeView})}"
+                   th:aria-label="${share.bookTitle + ' kitap detayını görüntüle'}">
 
-                    <div th:unless="${share.bookCoverImageUrl != null and !#strings.isEmpty(share.bookCoverImageUrl)}"
-                         class="share-no-cover">📖</div>
+                    <div class="share-card-image">
+                        <img th:if="${share.bookCoverImageUrl != null and !#strings.isEmpty(share.bookCoverImageUrl)}"
+                             th:src="${share.bookCoverImageUrl}"
+                             th:alt="${share.bookTitle}">
 
-                    <span class="share-type-label">Ücretsiz ödünç</span>
-                </div>
+                        <div th:unless="${share.bookCoverImageUrl != null and !#strings.isEmpty(share.bookCoverImageUrl)}"
+                             class="share-no-cover">📖</div>
+
+                        <span class="share-type-label">Ücretsiz ödünç</span>
+                    </div>
+
+                    <div class="share-card-extra">
+                        <h3 th:text="${share.bookTitle}">Kitap adı</h3>
+                        <p class="share-author" th:text="${share.bookAuthor}">Yazar</p>
+                    </div>
+
+                </a>
 
                 <div class="share-card-body">
-
-                    <h3 th:text="${share.bookTitle}">Kitap adı</h3>
-
-                    <p class="share-author" th:text="${share.bookAuthor}">Yazar</p>
 
                     <div class="share-condition"
                          th:if="${share.conditionDescription != null and !#strings.isEmpty(share.conditionDescription)}">
@@ -111,6 +169,7 @@
 
                     <div class="share-action"
                          th:if="${isAuthenticated and currentUserId == share.userId}">
+
                         <p>Bu kitap senin paylaşımın.</p>
 
                         <form th:action="@{/shares/{id}/close(id=${share.id})}"
@@ -119,6 +178,7 @@
                                 Paylaşımı Kaldır
                             </button>
                         </form>
+
                     </div>
 
                     <div class="share-action" th:unless="${isAuthenticated}">
@@ -132,6 +192,12 @@
 
         </div>
 
+        <div id="shareSearchEmpty" class="shares-empty" hidden>
+            <div class="shares-empty-icon">🔎</div>
+            <h3>Aradığın kitap bulunamadı</h3>
+            <p>Farklı bir kitap adı, yazar veya kullanıcı adı deneyebilirsin.</p>
+        </div>
+
     </section>
 
 </main>
@@ -140,6 +206,7 @@
     <p>ShareShelf · Kitaplar paylaştıkça çoğalır.</p>
 </footer>
 
+<script th:src="@{/js/shares.js}" defer></script>
 <script th:src="@{/js/auth.js}" defer></script>
 
 </body>
