@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -58,6 +59,7 @@ public class BookController {
     public String createBook(
             @Valid @ModelAttribute("bookRequest") BookRequestDto request,
             BindingResult bindingResult,
+            @RequestParam(required = false) MultipartFile coverImage,
             @AuthenticationPrincipal User currentUser,
             Model model) {
 
@@ -66,7 +68,7 @@ public class BookController {
             return "books/create";
         }
 
-        bookService.createBook(request, currentUser);
+        bookService.createBook(request, currentUser, coverImage);
 
         return "redirect:/books";
     }
@@ -92,6 +94,7 @@ public class BookController {
             @PathVariable Long id,
             @Valid @ModelAttribute("bookRequest") BookRequestDto request,
             BindingResult bindingResult,
+            @RequestParam(required = false) MultipartFile coverImage,
             @AuthenticationPrincipal User currentUser,
             Model model) {
 
@@ -102,7 +105,7 @@ public class BookController {
             return "books/edit";
         }
 
-        bookService.updateBook(id, request, currentUser);
+        bookService.updateBook(id, request, currentUser, coverImage);
 
         return "redirect:/books/" + id;
     }

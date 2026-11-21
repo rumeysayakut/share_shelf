@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -28,14 +29,17 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final GeminiService geminiService;
+    private final BookImageStorageService bookImageStorageService;
 
     public BookService(
             BookRepository bookRepository,
             BookMapper bookMapper,
-            GeminiService geminiService) {
+            GeminiService geminiService,
+            BookImageStorageService bookImageStorageService) {
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
         this.geminiService = geminiService;
+        this.bookImageStorageService = bookImageStorageService;
     }
 
     public List<BookResponseDto> getAllBooks() {
@@ -72,6 +76,14 @@ public class BookService {
     public BookResponseDto createBook(
             @Valid BookRequestDto request,
             User currentUser) {
+        return createBook(request, currentUser, null);
+    }
+
+    @Transactional
+    public BookResponseDto createBook(
+            @Valid BookRequestDto request,
+            User currentUser,
+            MultipartFile coverImage) {
 
         checkAuthenticatedUser(currentUser);
 
@@ -88,6 +100,12 @@ public class BookService {
         book.setDescription(request.getDescription().trim());
         book.setCreatedBy(currentUser);
 
+        String imagePath = bookImageStorageService.store(coverImage);
+
+        if (imagePath != null) {
+            book.setCoverImageUrl(imagePath);
+        }
+
         Book savedBook = bookRepository.save(book);
 
         return bookMapper.toResponseDto(savedBook);
@@ -98,6 +116,15 @@ public class BookService {
             Long id,
             @Valid BookRequestDto request,
             User currentUser) {
+        return updateBook(id, request, currentUser, null);
+    }
+
+    @Transactional
+    public BookResponseDto updateBook(
+            Long id,
+            @Valid BookRequestDto request,
+            User currentUser,
+            MultipartFile coverImage) {
 
         Book book = findBookById(id);
 
@@ -115,6 +142,12 @@ public class BookService {
         book.setAuthor(author);
         book.setIsbn(isbn);
         book.setDescription(request.getDescription().trim());
+
+        String imagePath = bookImageStorageService.store(coverImage);
+
+        if (imagePath != null) {
+            book.setCoverImageUrl(imagePath);
+        }
 
         return bookMapper.toResponseDto(bookRepository.save(book));
     }

@@ -5,11 +5,65 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveButton = document.getElementById("saveBookButton");
     const description = document.getElementById("description");
     const formMessage = document.getElementById("formMessage");
+    const imageInput = document.getElementById("coverImage");
+    const imagePreview = document.getElementById("imagePreview");
+    const imagePreviewContainer = document.getElementById("imagePreviewContainer");
+    const removeImageButton = document.getElementById("removeImageButton");
+    const imageError = document.getElementById("imageError");
+
+    let previewUrl = null;
 
     function showMessage(message, type) {
         formMessage.textContent = message;
         formMessage.className = `form-message ${type}`;
     }
+
+    function clearImagePreview() {
+        imageInput.value = "";
+        imagePreview.src = "";
+        imagePreviewContainer.hidden = true;
+        imageError.textContent = "";
+
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+    }
+
+    imageInput.addEventListener("change", () => {
+        imageError.textContent = "";
+
+        const file = imageInput.files[0];
+
+        if (!file) {
+            clearImagePreview();
+            return;
+        }
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+        if (!allowedTypes.includes(file.type)) {
+            clearImagePreview();
+            imageError.textContent = "Yalnızca JPG, PNG veya WEBP dosyası seçebilirsin.";
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            clearImagePreview();
+            imageError.textContent = "Fotoğraf en fazla 5 MB olabilir.";
+            return;
+        }
+
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+
+        previewUrl = URL.createObjectURL(file);
+        imagePreview.src = previewUrl;
+        imagePreviewContainer.hidden = false;
+    });
+
+    removeImageButton.addEventListener("click", clearImagePreview);
 
     generateButton.addEventListener("click", async () => {
         const title = document.getElementById("title").value.trim();
@@ -56,6 +110,18 @@ document.addEventListener("DOMContentLoaded", () => {
             event.preventDefault();
             showMessage("Kitabı eklemeden önce açıklama oluşturmalısın.", "error");
             return;
+        }
+
+        const file = imageInput.files[0];
+
+        if (file) {
+            const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+            if (!allowedTypes.includes(file.type) || file.size > 5 * 1024 * 1024) {
+                event.preventDefault();
+                imageError.textContent = "Fotoğraf türünü ve 5 MB sınırını kontrol et.";
+                return;
+            }
         }
 
         saveButton.disabled = true;

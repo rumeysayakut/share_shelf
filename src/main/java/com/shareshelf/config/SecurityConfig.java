@@ -1,3 +1,4 @@
+
 package com.shareshelf.config;
 
 import com.shareshelf.filter.JwtAuthenticationFilter;
@@ -65,6 +66,7 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
+                                "/uploads/**",
                                 "/favicon.ico",
                                 "/api/auth/**",
                                 "/api/csrf",

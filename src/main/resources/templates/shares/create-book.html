@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 
@@ -28,7 +29,9 @@
               class="share-new-book-form"
               th:action="@{/shares/new-book}"
               th:object="${bookRequest}"
-              method="post">
+              method="post"
+              enctype="multipart/form-data">
+
             <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
             <div class="form-section">
@@ -83,10 +86,34 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="coverImageUrl">Kapak Görseli URL</label>
+                    <label for="coverImage">Kitap Fotoğrafı</label>
+                    <input type="file"
+                           id="coverImage"
+                           name="coverImage"
+                           accept="image/jpeg,image/png,image/webp">
+                    <small class="field-error" id="imageError"></small>
+                    <p class="input-hint">JPG, PNG veya WEBP. En fazla 5 MB.</p>
+
+                    <div id="imagePreviewContainer" hidden style="margin-top: 15px;">
+                        <img id="imagePreview"
+                             src=""
+                             alt="Kitap fotoğrafı ön izlemesi"
+                             style="display:block; max-width:180px; max-height:240px; object-fit:contain; border-radius:10px; border:1px solid #E4DED3;">
+                        <button type="button"
+                                id="removeImageButton"
+                                class="share-secondary-button"
+                                style="margin-top:10px;">
+                            Fotoğrafı Kaldır
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="coverImageUrl">Veya Kapak Görseli URL</label>
                     <input type="url" id="coverImageUrl"
                            th:field="*{coverImageUrl}"
                            placeholder="https://...">
+                    <p class="input-hint">Fotoğraf yüklemek yerine görsel bağlantısı da kullanabilirsin.</p>
                 </div>
 
                 <div class="form-group">
