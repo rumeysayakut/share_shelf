@@ -23,6 +23,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .toUri()
                 .toString();
 
+        if (!location.endsWith("/")) {
+            location += "/";
+        }
+
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(location);
     }

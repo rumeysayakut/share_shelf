@@ -1,6 +1,7 @@
 
 package com.shareshelf.service;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,18 @@ public class BookImageStorageService {
                 .resolve("books");
     }
 
+    @PostConstruct
+    public void initialize() {
+        try {
+            Files.createDirectories(uploadDirectory);
+        } catch (IOException exception) {
+            throw new IllegalStateException(
+                    "Kitap görselleri klasörü oluşturulamadı.",
+                    exception
+            );
+        }
+    }
+
     public String store(MultipartFile file) {
 
         if (file == null || file.isEmpty()) {
@@ -48,8 +61,7 @@ public class BookImageStorageService {
             );
         }
 
-        String contentType = file.getContentType();
-        String extension = ALLOWED_TYPES.get(contentType);
+        String extension = ALLOWED_TYPES.get(file.getContentType());
 
         if (extension == null) {
             throw new ResponseStatusException(
@@ -61,8 +73,6 @@ public class BookImageStorageService {
         String fileName = UUID.randomUUID() + extension;
 
         try {
-            Files.createDirectories(uploadDirectory);
-
             Path targetPath = uploadDirectory.resolve(fileName).normalize();
 
             if (!targetPath.startsWith(uploadDirectory)) {
