@@ -29,14 +29,11 @@ public class BorrowingController {
 
         try {
             borrowingService.createRequest(shareId, currentUser);
-
             redirectAttributes.addFlashAttribute(
                     "successMessage",
                     "Ödünç alma isteğiniz kitap sahibine gönderildi."
             );
-
         } catch (ResponseStatusException exception) {
-
             if (exception.getStatusCode() == HttpStatus.CONFLICT) {
                 redirectAttributes.addFlashAttribute(
                         "errorMessage",
@@ -86,7 +83,7 @@ public class BorrowingController {
 
         redirectAttributes.addFlashAttribute(
                 "successMessage",
-                "İstek kabul edildi. Kitap rezerve edildi."
+                "İstek kabul edildi. Kitap sahibiyle artık sohbet edebilirsiniz."
         );
 
         return "redirect:/borrowings";
@@ -103,6 +100,45 @@ public class BorrowingController {
         redirectAttributes.addFlashAttribute(
                 "successMessage",
                 "Ödünç alma isteği reddedildi."
+        );
+
+        return "redirect:/borrowings";
+    }
+
+    @PostMapping("/{borrowingId}/confirm-handover")
+    public String confirmHandover(
+            @PathVariable Long borrowingId,
+            @AuthenticationPrincipal User currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        var result = borrowingService.confirmHandover(borrowingId, currentUser);
+
+        if (result.getStatus().name().equals("BORROWED")) {
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Teslimat iki tarafça da onaylandı. Kitap artık ödünç verilmiş durumda."
+            );
+        } else {
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Onayınız kaydedildi. Diğer tarafın da teslimatı onaylaması bekleniyor."
+            );
+        }
+
+        return "redirect:/conversations/borrowing/" + borrowingId;
+    }
+
+    @PostMapping("/{borrowingId}/cancel")
+    public String cancelAcceptedRequest(
+            @PathVariable Long borrowingId,
+            @AuthenticationPrincipal User currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        borrowingService.cancelAcceptedRequest(borrowingId, currentUser);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Paylaşım görüşmesi iptal edildi. Kitap yeniden paylaşımda."
         );
 
         return "redirect:/borrowings";

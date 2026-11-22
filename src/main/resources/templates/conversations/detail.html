@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 
@@ -29,7 +30,6 @@
         }
 
         .conversation-heading p {
-            margin: 0;
             color: #77736D;
             font-size: 14px;
         }
@@ -74,6 +74,101 @@
             margin-top: 5px;
             color: #85877F;
             font-size: 12px;
+        }
+
+        .handover-panel {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #E9E2D9;
+            border-radius: 12px;
+            background: #FDFBF7;
+        }
+
+        .handover-panel h3 {
+            margin: 0 0 8px;
+            color: #1B4332;
+            font-size: 16px;
+        }
+
+        .handover-panel p {
+            color: #77736D;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .handover-status {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #EAF1EC;
+            color: #1B4332;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .handover-confirmations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .handover-confirmations span {
+            padding: 8px 11px;
+            border-radius: 8px;
+            background: #F0EDE7;
+            color: #62665F;
+            font-size: 12px;
+        }
+
+        .handover-confirmations .confirmed {
+            background: #EAF1EC;
+            color: #1B4332;
+        }
+
+        .handover-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .handover-actions form {
+            margin: 0;
+        }
+
+        .handover-button {
+            min-height: 43px;
+            padding: 0 18px;
+            border: 0;
+            border-radius: 9px;
+            background: #1B4332;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .handover-cancel {
+            min-height: 43px;
+            padding: 0 18px;
+            border: 1px solid #F5C6C6;
+            border-radius: 9px;
+            background: #FDECEC;
+            color: #9B2C2C;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .conversation-notice {
+            margin: 20px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: #EAF1EC;
+            color: #1B4332;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         .conversation-messages {
@@ -165,10 +260,6 @@
             font-size: 14px;
         }
 
-        .conversation-form textarea:focus {
-            border-color: #1B4332;
-        }
-
         .conversation-form button {
             min-height: 48px;
             padding: 0 23px;
@@ -181,17 +272,9 @@
             cursor: pointer;
         }
 
-        .conversation-form button:hover {
-            background: #24563F;
-        }
-
         @media (max-width: 550px) {
             .conversation-page {
                 margin-top: 25px;
-            }
-
-            .conversation-heading h1 {
-                font-size: 23px;
             }
 
             .conversation-messages {
@@ -223,18 +306,13 @@
 
     <div class="conversation-heading">
         <a th:href="@{/borrowings}">← Ödünç İşlemlerine Dön</a>
-
-        <h1 th:text="${conversation.bookShare.book.title}">
-            Kitap adı
-        </h1>
-
+        <h1 th:text="${conversation.bookShare.book.title}">Kitap adı</h1>
         <p>Kitap paylaşımı hakkında iletişim kurabilirsin.</p>
     </div>
 
     <section class="conversation-card">
 
         <div class="conversation-user">
-
             <div class="conversation-avatar">
                 <span th:text="${#strings.substring(
                     conversation.userOne.id == currentUserId
@@ -255,7 +333,95 @@
 
                 <span>ShareShelf sohbeti</span>
             </div>
+        </div>
 
+        <div class="conversation-notice"
+             th:if="${successMessage != null}"
+             th:text="${successMessage}">
+        </div>
+
+        <div class="conversation-notice"
+             th:if="${errorMessage != null}"
+             th:text="${errorMessage}">
+        </div>
+
+        <section class="handover-panel"
+                 th:if="${conversation.borrowing.status.name() == 'ACCEPTED' or conversation.borrowing.status.name() == 'HANDOVER_PENDING' or conversation.borrowing.status.name() == 'BORROWED'}">
+
+            <h3>Kitap teslim durumu</h3>
+
+            <p th:if="${conversation.borrowing.status.name() == 'ACCEPTED'}">
+                Görüşme aşamasındasınız. Teslimat gerçekleştiğinde iki taraf da onay vermelidir.
+            </p>
+
+            <p th:if="${conversation.borrowing.status.name() == 'HANDOVER_PENDING'}">
+                Teslimat onaylarından biri verildi. İşlemin tamamlanması için diğer tarafın onayı bekleniyor.
+            </p>
+
+            <p th:if="${conversation.borrowing.status.name() == 'BORROWED'}">
+                İki taraf da teslimatı onayladı. Kitap ödünç verilmiş durumda.
+            </p>
+
+            <span class="handover-status"
+                  th:if="${conversation.borrowing.status.name() == 'ACCEPTED'}">
+                Görüşme aşamasında
+            </span>
+
+            <span class="handover-status"
+                  th:if="${conversation.borrowing.status.name() == 'HANDOVER_PENDING'}">
+                Teslim onayı bekleniyor
+            </span>
+
+            <span class="handover-status"
+                  th:if="${conversation.borrowing.status.name() == 'BORROWED'}">
+                Ödünç verildi
+            </span>
+
+            <div class="handover-confirmations">
+                <span th:classappend="${conversation.borrowing.ownerHandoverConfirmed} ? ' confirmed' : ''"
+                      th:text="${conversation.borrowing.ownerHandoverConfirmed} ? '✓ Kitap sahibi teslim etti' : '○ Kitap sahibi onayı bekleniyor'">
+                    Kitap sahibi onayı
+                </span>
+
+                <span th:classappend="${conversation.borrowing.borrowerHandoverConfirmed} ? ' confirmed' : ''"
+                      th:text="${conversation.borrowing.borrowerHandoverConfirmed} ? '✓ Ödünç alan teslim aldı' : '○ Ödünç alan onayı bekleniyor'">
+                    Ödünç alan onayı
+                </span>
+            </div>
+
+            <div class="handover-actions"
+                 th:if="${conversation.borrowing.status.name() == 'ACCEPTED' or conversation.borrowing.status.name() == 'HANDOVER_PENDING'}">
+
+                <form th:if="${conversation.borrowing.bookShare.user.id == currentUserId and !conversation.borrowing.ownerHandoverConfirmed}"
+                      th:action="@{/borrowings/{id}/confirm-handover(id=${conversation.borrowing.id})}"
+                      method="post">
+                    <button type="submit" class="handover-button">
+                        Teslim Ettim
+                    </button>
+                </form>
+
+                <form th:if="${conversation.borrowing.borrower.id == currentUserId and !conversation.borrowing.borrowerHandoverConfirmed}"
+                      th:action="@{/borrowings/{id}/confirm-handover(id=${conversation.borrowing.id})}"
+                      method="post">
+                    <button type="submit" class="handover-button">
+                        Teslim Aldım
+                    </button>
+                </form>
+
+                <form th:action="@{/borrowings/{id}/cancel(id=${conversation.borrowing.id})}"
+                      method="post"
+                      onsubmit="return confirm('Görüşmeyi iptal etmek istediğine emin misin?');">
+                    <button type="submit" class="handover-cancel">
+                        Paylaşımından Vazgeç
+                    </button>
+                </form>
+
+            </div>
+        </section>
+
+        <div class="conversation-notice"
+             th:if="${conversation.borrowing.status.name() == 'CANCELLED'}">
+            Bu kitap paylaşımı iptal edildi. Sohbet geçmişini görüntüleyebilirsin ancak yeni mesaj gönderemezsin.
         </div>
 
         <div class="conversation-messages" id="conversationMessages">
@@ -269,7 +435,6 @@
                  th:classappend="${message.sender.id == currentUserId} ? ' own' : ''">
 
                 <div class="message-bubble">
-
                     <div class="message-sender"
                          th:text="${message.sender.firstName}">
                         Kullanıcı
@@ -284,14 +449,13 @@
                          th:if="${message.sentAt != null}"
                          th:text="${#temporals.format(message.sentAt, 'dd.MM.yyyy HH:mm')}">
                     </div>
-
                 </div>
-
             </div>
 
         </div>
 
         <form class="conversation-form"
+              th:if="${conversation.borrowing.status.name() != 'CANCELLED'}"
               th:action="@{/conversations/{id}/messages(id=${conversation.id})}"
               method="post">
 
@@ -301,7 +465,6 @@
                       required></textarea>
 
             <button type="submit">Gönder</button>
-
         </form>
 
     </section>

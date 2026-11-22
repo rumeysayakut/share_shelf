@@ -25,6 +25,7 @@ public class BorrowingService {
 
     private final List<BorrowingStatus> activeStatuses = List.of(
             BorrowingStatus.ACCEPTED,
+            BorrowingStatus.HANDOVER_PENDING,
             BorrowingStatus.BORROWED,
             BorrowingStatus.RETURN_PENDING,
             BorrowingStatus.OVERDUE,
@@ -34,6 +35,7 @@ public class BorrowingService {
     private final List<BorrowingStatus> requestStatuses = List.of(
             BorrowingStatus.PENDING,
             BorrowingStatus.ACCEPTED,
+            BorrowingStatus.HANDOVER_PENDING,
             BorrowingStatus.BORROWED,
             BorrowingStatus.RETURN_PENDING,
             BorrowingStatus.OVERDUE,
@@ -43,6 +45,7 @@ public class BorrowingService {
     private final List<BorrowingStatus> incomingStatuses = List.of(
             BorrowingStatus.PENDING,
             BorrowingStatus.ACCEPTED,
+            BorrowingStatus.HANDOVER_PENDING,
             BorrowingStatus.BORROWED,
             BorrowingStatus.RETURN_PENDING,
             BorrowingStatus.RETURNED,
@@ -60,16 +63,8 @@ public class BorrowingService {
     }
 
     @Transactional
-    public BorrowingResponseDto createRequest(
-            Long bookShareId,
-            User currentUser) {
-
-        if (currentUser == null || currentUser.getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Ödünç alma isteği göndermek için giriş yapmalısınız."
-            );
-        }
+    public BorrowingResponseDto createRequest(Long bookShareId, User currentUser) {
+        validateUser(currentUser);
 
         BookShare bookShare = bookShareRepository.findById(bookShareId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -112,33 +107,29 @@ public class BorrowingService {
                 .status(BorrowingStatus.PENDING)
                 .build();
 
-        Borrowing savedBorrowing = borrowingRepository.save(borrowing);
-
-        return borrowingMapper.toResponseDto(savedBorrowing);
+        return borrowingMapper.toResponseDto(
+                borrowingRepository.save(borrowing)
+        );
     }
 
     public boolean hasActiveRequest(Long bookShareId, User currentUser) {
-
         if (currentUser == null || currentUser.getId() == null) {
             return false;
         }
 
-        return borrowingRepository
-                .existsByBookShare_IdAndBorrower_IdAndStatusIn(
-                        bookShareId,
-                        currentUser.getId(),
-                        requestStatuses
-                );
+        return borrowingRepository.existsByBookShare_IdAndBorrower_IdAndStatusIn(
+                bookShareId,
+                currentUser.getId(),
+                requestStatuses
+        );
     }
 
     public Set<Long> getActiveRequestShareIds(User currentUser) {
-
         if (currentUser == null || currentUser.getId() == null) {
             return Set.of();
         }
 
-        return borrowingRepository
-                .findAllByBorrower_IdAndStatusIn(
+        return borrowingRepository.findAllByBorrower_IdAndStatusIn(
                         currentUser.getId(),
                         requestStatuses
                 )
@@ -148,13 +139,7 @@ public class BorrowingService {
     }
 
     public List<BorrowingResponseDto> getMyRequests(User currentUser) {
-
-        if (currentUser == null || currentUser.getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "İsteklerinizi görüntülemek için giriş yapmalısınız."
-            );
-        }
+        validateUser(currentUser);
 
         return borrowingRepository
                 .findAllByBorrower_IdOrderByRequestedAtDesc(currentUser.getId())
@@ -164,10 +149,7 @@ public class BorrowingService {
     }
 
     @Transactional
-    public BorrowingResponseDto acceptRequest(
-            Long borrowingId,
-            User currentUser) {
-
+    public BorrowingResponseDto acceptRequest(Long borrowingId, User currentUser) {
         Borrowing borrowing = findOwnerRequest(borrowingId, currentUser);
 
         if (borrowing.getStatus() != BorrowingStatus.PENDING) {
@@ -211,10 +193,7 @@ public class BorrowingService {
     }
 
     @Transactional
-    public BorrowingResponseDto rejectRequest(
-            Long borrowingId,
-            User currentUser) {
-
+    public BorrowingResponseDto rejectRequest(Long borrowingId, User currentUser) {
         Borrowing borrowing = findOwnerRequest(borrowingId, currentUser);
 
         if (borrowing.getStatus() != BorrowingStatus.PENDING) {
@@ -231,14 +210,119 @@ public class BorrowingService {
         );
     }
 
-    public List<BorrowingResponseDto> getIncomingRequests(User currentUser) {
+    @Transactional
+    public BorrowingResponseDto confirmHandover(Long borrowingId, User currentUser) {
+        validateUser(currentUser);
 
-        if (currentUser == null || currentUser.getId() == null) {
+        Borrowing borrowing = borrowingRepository.findById(borrowingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ödünç alma isteği bulunamadı."
+                ));
+
+        boolean isOwner = borrowing.getBookShare().getUser()
+                .getId().equals(currentUser.getId());
+
+        boolean isBorrower = borrowing.getBorrower()
+                .getId().equals(currentUser.getId());
+
+        if (!isOwner && !isBorrower) {
             throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Bu sayfayı görüntülemek için giriş yapmalısınız."
+                    HttpStatus.FORBIDDEN,
+                    "Bu işlem için yetkiniz yok."
             );
         }
+
+        if (borrowing.getStatus() != BorrowingStatus.ACCEPTED &&
+                borrowing.getStatus() != BorrowingStatus.HANDOVER_PENDING) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Bu işlem şu anda teslim onayı beklemiyor."
+            );
+        }
+
+        if (isOwner) {
+            if (borrowing.isOwnerHandoverConfirmed()) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Teslim ettiğinizi zaten onayladınız."
+                );
+            }
+
+            borrowing.setOwnerHandoverConfirmed(true);
+        }
+
+        if (isBorrower) {
+            if (borrowing.isBorrowerHandoverConfirmed()) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Teslim aldığınızı zaten onayladınız."
+                );
+            }
+
+            borrowing.setBorrowerHandoverConfirmed(true);
+        }
+
+        if (borrowing.isOwnerHandoverConfirmed() &&
+                borrowing.isBorrowerHandoverConfirmed()) {
+            borrowing.setStatus(BorrowingStatus.BORROWED);
+            borrowing.setBorrowedAt(LocalDateTime.now());
+        } else {
+            borrowing.setStatus(BorrowingStatus.HANDOVER_PENDING);
+        }
+
+        return borrowingMapper.toResponseDto(
+                borrowingRepository.save(borrowing)
+        );
+    }
+
+    @Transactional
+    public BorrowingResponseDto cancelAcceptedRequest(
+            Long borrowingId,
+            User currentUser) {
+        validateUser(currentUser);
+
+        Borrowing borrowing = borrowingRepository.findById(borrowingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ödünç alma isteği bulunamadı."
+                ));
+
+        boolean isOwner = borrowing.getBookShare().getUser()
+                .getId().equals(currentUser.getId());
+
+        boolean isBorrower = borrowing.getBorrower()
+                .getId().equals(currentUser.getId());
+
+        if (!isOwner && !isBorrower) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Bu işlem için yetkiniz yok."
+            );
+        }
+
+        if (borrowing.getStatus() != BorrowingStatus.ACCEPTED &&
+                borrowing.getStatus() != BorrowingStatus.HANDOVER_PENDING) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Bu aşamada paylaşım iptal edilemez."
+            );
+        }
+
+        borrowing.setStatus(BorrowingStatus.CANCELLED);
+
+        BookShare bookShare = borrowing.getBookShare();
+        bookShare.setStatus(BookShareStatus.ACTIVE);
+
+        bookShareRepository.save(bookShare);
+
+        return borrowingMapper.toResponseDto(
+                borrowingRepository.save(borrowing)
+        );
+    }
+
+    public List<BorrowingResponseDto> getIncomingRequests(User currentUser) {
+        validateUser(currentUser);
 
         return borrowingRepository
                 .findAllByBookShare_User_IdAndStatusInOrderByRequestedAtDesc(
@@ -251,16 +335,9 @@ public class BorrowingService {
     }
 
     private Borrowing findOwnerRequest(Long borrowingId, User currentUser) {
+        validateUser(currentUser);
 
-        if (currentUser == null || currentUser.getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "İşlem yapmak için giriş yapmalısınız."
-            );
-        }
-
-        return borrowingRepository
-                .findByIdAndBookShare_User_Id(
+        return borrowingRepository.findByIdAndBookShare_User_Id(
                         borrowingId,
                         currentUser.getId()
                 )
@@ -268,5 +345,14 @@ public class BorrowingService {
                         HttpStatus.NOT_FOUND,
                         "İstek bulunamadı veya bu işlem için yetkiniz yok."
                 ));
+    }
+
+    private void validateUser(User currentUser) {
+        if (currentUser == null || currentUser.getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Bu işlem için giriş yapmalısınız."
+            );
+        }
     }
 }

@@ -32,26 +32,26 @@ public class Borrowing {
     @Builder.Default
     private BorrowingStatus status = BorrowingStatus.PENDING;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean ownerHandoverConfirmed = false;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean borrowerHandoverConfirmed = false;
+
     private LocalDateTime requestedAt;
-
     private LocalDateTime acceptedAt;
-
     private LocalDateTime dueDate;
-
     private LocalDateTime borrowedAt;
-
     private LocalDateTime returnRequestedAt;
-
     private LocalDateTime returnedAt;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
-
         requestedAt = now;
         createdAt = now;
         updatedAt = now;

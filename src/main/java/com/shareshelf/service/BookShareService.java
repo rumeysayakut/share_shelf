@@ -1,3 +1,4 @@
+
 package com.shareshelf.service;
 
 import com.shareshelf.dto.request.BookShareRequestDto;
@@ -67,9 +68,9 @@ public class BookShareService {
         bookShare.setDepositAmount(null);
         bookShare.setSalePrice(null);
 
-        BookShare savedShare = bookShareRepository.save(bookShare);
-
-        return bookShareMapper.toResponseDto(savedShare);
+        return bookShareMapper.toResponseDto(
+                bookShareRepository.save(bookShare)
+        );
     }
 
     public List<BookShareResponseDto> getActiveShares() {
@@ -84,7 +85,10 @@ public class BookShareService {
     public List<BookShareResponseDto> getActiveSharesByUserId(Long userId) {
         return bookShareRepository.findAll()
                 .stream()
-                .filter(share -> share.getStatus() == BookShareStatus.ACTIVE)
+                .filter(share ->
+                        share.getStatus() == BookShareStatus.ACTIVE ||
+                        share.getStatus() == BookShareStatus.RESERVED
+                )
                 .filter(share -> share.getShareType() == ShareType.LOAN)
                 .filter(share -> share.getUser() != null)
                 .filter(share -> share.getUser().getId().equals(userId))
@@ -94,7 +98,6 @@ public class BookShareService {
 
     @Transactional
     public void closeShare(Long shareId, User currentUser) {
-
         if (currentUser == null || currentUser.getId() == null) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,

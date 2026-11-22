@@ -122,7 +122,17 @@ public class ConversationService {
             );
         }
 
-        Conversation conversation = getAccessibleConversation(conversationId, currentUser);
+        Conversation conversation = getAccessibleConversation(
+                conversationId,
+                currentUser
+        );
+
+        if (conversation.getBorrowing().getStatus() == BorrowingStatus.CANCELLED) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "İptal edilen bir görüşmede mesaj gönderemezsiniz."
+            );
+        }
 
         Message message = Message.builder()
                 .conversation(conversation)
@@ -138,11 +148,13 @@ public class ConversationService {
 
     private boolean isConversationAllowed(BorrowingStatus status) {
         return status == BorrowingStatus.ACCEPTED ||
+                status == BorrowingStatus.HANDOVER_PENDING ||
                 status == BorrowingStatus.BORROWED ||
                 status == BorrowingStatus.RETURN_PENDING ||
                 status == BorrowingStatus.RETURNED ||
                 status == BorrowingStatus.OVERDUE ||
-                status == BorrowingStatus.DISPUTED;
+                status == BorrowingStatus.DISPUTED ||
+                status == BorrowingStatus.CANCELLED;
     }
 
     private void validateUser(User currentUser) {

@@ -9,6 +9,28 @@
     <link rel="stylesheet" th:href="@{/css/books.css}">
     <link rel="stylesheet" th:href="@{/css/shares.css}">
     <link rel="stylesheet" th:href="@{/css/shares-enhancements.css}">
+    <style>
+        .share-reserved-notice {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #FFF4DF;
+            color: #8A5A00;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .share-status-label {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 11px;
+            border-radius: 20px;
+            background: #FFF4DF;
+            color: #8A5A00;
+            font-size: 11px;
+            font-weight: 700;
+        }
+    </style>
 </head>
 
 <body>
@@ -155,20 +177,26 @@
                         </span>
                     </div>
 
+                    <div th:if="${activeView == 'mine' and share.status.name() == 'RESERVED'}">
+                        <span class="share-status-label">Görüşme aşamasında</span>
+                        <p class="share-reserved-notice">
+                            Bu kitap için bir ödünç alma isteğini kabul ettin.
+                            Teslimat tamamlanana veya görüşme iptal edilene kadar yeni istek alamazsın.
+                        </p>
+                    </div>
+
                     <div class="share-action"
                          th:if="${isAuthenticated and currentUserId != share.userId}">
-
                         <form th:action="@{/borrowings/shares/{id}/request(id=${share.id})}"
                               method="post">
                             <button type="submit" class="shares-primary-button">
                                 Ödünç Al
                             </button>
                         </form>
-
                     </div>
 
                     <div class="share-action"
-                         th:if="${isAuthenticated and currentUserId == share.userId}">
+                         th:if="${isAuthenticated and currentUserId == share.userId and share.status.name() == 'ACTIVE'}">
 
                         <p>Bu kitap senin paylaşımın.</p>
 
@@ -178,7 +206,6 @@
                                 Paylaşımı Kaldır
                             </button>
                         </form>
-
                     </div>
 
                     <div class="share-action" th:unless="${isAuthenticated}">
