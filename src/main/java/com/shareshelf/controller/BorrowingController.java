@@ -175,4 +175,22 @@ public class BorrowingController {
 
         return "redirect:/borrowings";
     }
+
+    @PostMapping("/{borrowingId}/hide")
+    public String hideRequest(
+            @PathVariable Long borrowingId,
+            @RequestParam(defaultValue = "incoming") String view,
+            @AuthenticationPrincipal User currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        borrowingService.hideRequest(borrowingId, currentUser);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "İstek yalnızca senin listenden kaldırıldı."
+        );
+
+        return "redirect:/borrowings?view=" +
+                ("sent".equals(view) ? "sent" : "incoming");
+    }
 }

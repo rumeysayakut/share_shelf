@@ -109,6 +109,13 @@
             font-size: 11px !important;
         }
 
+        .conversation-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
         .conversation-open {
             display: inline-flex;
             align-items: center;
@@ -126,6 +133,22 @@
 
         .conversation-open:hover {
             background: #2D6048;
+        }
+
+        .conversation-delete {
+            min-height: 43px;
+            padding: 0 16px;
+            border: 1px solid #F0CACA;
+            border-radius: 9px;
+            background: #FFF5F5;
+            color: #A33A3A;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .conversation-delete:hover {
+            background: #FDECEC;
         }
 
         .messages-empty {
@@ -168,7 +191,13 @@
                 flex-direction: column;
             }
 
-            .conversation-open {
+            .conversation-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .conversation-open,
+            .conversation-delete {
                 width: 100%;
             }
 
@@ -186,7 +215,7 @@
 <main class="messages-page">
 
     <div class="messages-heading">
-        <span>SHARESHELF İLETİŞİM</span>
+        <span>SHAREShelf İLETİŞİM</span>
         <h1>Mesajlarım</h1>
         <p>Kitap paylaşımı yaptığın kullanıcılarla olan sohbetlerini buradan takip edebilirsin.</p>
     </div>
@@ -252,10 +281,24 @@
 
             </div>
 
-            <a class="conversation-open"
-               th:href="@{/conversations/borrowing/{id}(id=${conversation.borrowing.id})}">
-                Sohbete Git
-            </a>
+            <div class="conversation-actions">
+
+                <a class="conversation-open"
+                   th:href="@{/conversations/borrowing/{id}(id=${conversation.borrowing.id})}">
+                    Sohbete Git
+                </a>
+
+                <form th:action="@{/conversations/{id}/delete(id=${conversation.id})}"
+                      method="post"
+                      onsubmit="return confirm('Bu sohbet yalnızca senin sohbet listenden kaldırılacak. Devam etmek istiyor musun?');">
+
+                    <button type="submit" class="conversation-delete">
+                        Sohbeti Sil
+                    </button>
+
+                </form>
+
+            </div>
 
         </article>
 

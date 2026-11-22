@@ -85,6 +85,22 @@
             background: #F8DADA;
         }
 
+        .borrowing-hide-button {
+            min-height: 47px;
+            padding: 0 24px;
+            color: #62665F;
+            background: #F3EFEA;
+            border: 1px solid #EAE4DC;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .borrowing-hide-button:hover {
+            background: #E8E3DB;
+        }
+
         .conversation-button {
             display: inline-flex;
             align-items: center;
@@ -250,6 +266,21 @@
                            class="conversation-button">
                             Sohbete Git
                         </a>
+
+                    </div>
+
+                    <div class="borrowing-actions"
+                         th:if="${request.status != null and (request.status.name() == 'PENDING' or request.status.name() == 'REJECTED' or request.status.name() == 'CANCELLED' or request.status.name() == 'RETURNED')}">
+
+                        <form th:action="@{/borrowings/{id}/hide(id=${request.id}, view=${view})}"
+                              method="post"
+                              onsubmit="return confirm('Bu isteği yalnızca kendi listenden kaldırmak istediğine emin misin?');">
+
+                            <button type="submit" class="borrowing-hide-button">
+                                Listemden Sil
+                            </button>
+
+                        </form>
 
                     </div>
 

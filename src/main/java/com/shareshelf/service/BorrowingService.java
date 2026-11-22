@@ -142,7 +142,7 @@ public class BorrowingService {
         validateUser(currentUser);
 
         return borrowingRepository
-                .findAllByBorrower_IdOrderByRequestedAtDesc(currentUser.getId())
+                .findVisibleRequestsByBorrowerId(currentUser.getId())
                 .stream()
                 .map(borrowingMapper::toResponseDto)
                 .toList();
@@ -402,13 +402,57 @@ public class BorrowingService {
         validateUser(currentUser);
 
         return borrowingRepository
-                .findAllByBookShare_User_IdAndStatusInOrderByRequestedAtDesc(
-                        currentUser.getId(),
-                        incomingStatuses
-                )
+                .findVisibleIncomingRequests(currentUser.getId(), incomingStatuses)
                 .stream()
                 .map(borrowingMapper::toResponseDto)
                 .toList();
+    }
+
+    @Transactional
+    public void hideRequest(Long borrowingId, User currentUser) {
+        validateUser(currentUser);
+
+        Borrowing borrowing = borrowingRepository.findById(borrowingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ödünç alma isteği bulunamadı."
+                ));
+
+        boolean isOwner = borrowing.getBookShare().getUser()
+                .getId().equals(currentUser.getId());
+
+        boolean isBorrower = borrowing.getBorrower()
+                .getId().equals(currentUser.getId());
+
+        if (!isOwner && !isBorrower) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Bu isteği gizleme yetkiniz yok."
+            );
+        }
+
+        BorrowingStatus status = borrowing.getStatus();
+
+        boolean canHide =
+                status == BorrowingStatus.PENDING ||
+                status == BorrowingStatus.REJECTED ||
+                status == BorrowingStatus.CANCELLED ||
+                status == BorrowingStatus.RETURNED;
+
+        if (!canHide) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Devam eden ödünç işlemleri gizlenemez."
+            );
+        }
+
+        if (isOwner) {
+            borrowing.setOwnerDeletedAt(LocalDateTime.now());
+        } else {
+            borrowing.setBorrowerDeletedAt(LocalDateTime.now());
+        }
+
+        borrowingRepository.save(borrowing);
     }
 
     private Borrowing findOwnerRequest(Long borrowingId, User currentUser) {

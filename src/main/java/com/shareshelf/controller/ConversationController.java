@@ -57,6 +57,16 @@ public class ConversationController {
         return "conversations/detail";
     }
 
+    @PostMapping("/{conversationId}/delete")
+    public String deleteConversation(
+            @PathVariable Long conversationId,
+            @AuthenticationPrincipal User currentUser) {
+
+        conversationService.deleteConversation(conversationId, currentUser);
+
+        return "redirect:/conversations";
+    }
+
     @PostMapping("/{conversationId}/messages")
     public String sendMessage(
             @PathVariable Long conversationId,

@@ -59,7 +59,7 @@ public class ConversationService {
             );
         }
 
-        return conversationRepository.findByBorrowing_Id(borrowingId)
+        Conversation conversation = conversationRepository.findByBorrowing_Id(borrowingId)
                 .orElseGet(() -> conversationRepository.save(
                         Conversation.builder()
                                 .borrowing(borrowing)
@@ -68,6 +68,14 @@ public class ConversationService {
                                 .userTwo(borrowing.getBorrower())
                                 .build()
                 ));
+
+        if (conversation.getUserOne().getId().equals(currentUser.getId())) {
+            conversation.setUserOneDeletedAt(null);
+        } else {
+            conversation.setUserTwoDeletedAt(null);
+        }
+
+        return conversationRepository.save(conversation);
     }
 
     @Transactional
@@ -101,6 +109,20 @@ public class ConversationService {
     }
 
     @Transactional
+    public void deleteConversation(Long conversationId, User currentUser) {
+        Conversation conversation = getAccessibleConversation(conversationId, currentUser);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (conversation.getUserOne().getId().equals(currentUser.getId())) {
+            conversation.setUserOneDeletedAt(now);
+        } else {
+            conversation.setUserTwoDeletedAt(now);
+        }
+
+        conversationRepository.save(conversation);
+    }
+
+    @Transactional
     public List<Message> getMessages(Long conversationId, User currentUser) {
         getAccessibleConversation(conversationId, currentUser);
         return messageRepository.findMessagesByConversationId(conversationId);
@@ -122,10 +144,7 @@ public class ConversationService {
             );
         }
 
-        Conversation conversation = getAccessibleConversation(
-                conversationId,
-                currentUser
-        );
+        Conversation conversation = getAccessibleConversation(conversationId, currentUser);
 
         if (conversation.getBorrowing().getStatus() == BorrowingStatus.CANCELLED) {
             throw new ResponseStatusException(

@@ -4,6 +4,8 @@ package com.shareshelf.repository;
 import com.shareshelf.entity.Borrowing;
 import com.shareshelf.entity.BorrowingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +47,28 @@ public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
     List<Borrowing> findAllByBookShare_User_IdAndStatusInOrderByRequestedAtDesc(
             Long ownerId,
             Collection<BorrowingStatus> statuses
+    );
+
+    @Query("""
+            SELECT b FROM Borrowing b
+            WHERE b.borrower.id = :borrowerId
+            AND b.borrowerDeletedAt IS NULL
+            ORDER BY b.requestedAt DESC
+            """)
+    List<Borrowing> findVisibleRequestsByBorrowerId(
+            @Param("borrowerId") Long borrowerId
+    );
+
+    @Query("""
+            SELECT b FROM Borrowing b
+            WHERE b.bookShare.user.id = :ownerId
+            AND b.status IN :statuses
+            AND b.ownerDeletedAt IS NULL
+            ORDER BY b.requestedAt DESC
+            """)
+    List<Borrowing> findVisibleIncomingRequests(
+            @Param("ownerId") Long ownerId,
+            @Param("statuses") Collection<BorrowingStatus> statuses
     );
 
     List<Borrowing> findAllByBorrower_IdOrderByRequestedAtDesc(

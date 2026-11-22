@@ -48,6 +48,8 @@ public class Borrowing {
     private LocalDateTime returnedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime ownerDeletedAt;
+    private LocalDateTime borrowerDeletedAt;
 
     @PrePersist
     protected void onCreate() {

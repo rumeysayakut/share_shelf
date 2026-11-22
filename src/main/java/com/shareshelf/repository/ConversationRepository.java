@@ -19,7 +19,8 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
             JOIN FETCH bs.book
             JOIN FETCH c.userOne
             JOIN FETCH c.userTwo
-            WHERE c.userOne.id = :userId OR c.userTwo.id = :userId
+            WHERE (c.userOne.id = :userId AND c.userOneDeletedAt IS NULL)
+               OR (c.userTwo.id = :userId AND c.userTwoDeletedAt IS NULL)
             ORDER BY c.updatedAt DESC
             """)
     List<Conversation> findAllByParticipantId(@Param("userId") Long userId);

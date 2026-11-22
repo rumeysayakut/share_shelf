@@ -1,3 +1,4 @@
+
 package com.shareshelf.entity;
 
 import jakarta.persistence.*;
@@ -33,6 +34,10 @@ public class Conversation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_two_id", nullable = false)
     private User userTwo;
+
+    private LocalDateTime userOneDeletedAt;
+
+    private LocalDateTime userTwoDeletedAt;
 
     private LocalDateTime createdAt;
 
