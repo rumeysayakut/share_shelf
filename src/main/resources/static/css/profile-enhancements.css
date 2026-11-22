@@ -1,0 +1,308 @@
+
+.shared-books-section {
+    padding-top: 55px;
+}
+
+.shared-books-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.shared-books-heading h2 {
+    margin: 9px 0;
+    color: #1B4332;
+    font-size: 29px;
+}
+
+.shared-books-heading p {
+    margin: 0;
+    color: #77736D;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.shared-books-add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 0 19px;
+    border-radius: 9px;
+    background: #1B4332;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.shared-books-add-button:hover {
+    background: #286044;
+    transform: translateY(-2px);
+}
+
+.shared-books-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.shared-book-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    min-width: 0;
+    padding: 19px;
+    border: 1px solid #E4DED3;
+    border-radius: 14px;
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.shared-book-card:hover {
+    border-color: #9CB7A3;
+    box-shadow: 0 9px 24px rgba(27, 67, 50, 0.07);
+}
+
+.shared-book-cover {
+    width: 76px;
+    height: 105px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 7px;
+    background: #EAF1EC;
+    color: #1B4332;
+    font-size: 32px;
+}
+
+.shared-book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.shared-book-information {
+    flex: 1;
+    min-width: 0;
+}
+
+.shared-book-information h3 {
+    margin: 10px 0 5px;
+    color: #1B4332;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+}
+
+.shared-book-information p {
+    margin: 0 0 12px;
+    color: #77736D;
+    font-size: 12px;
+}
+
+.shared-book-status {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.shared-book-status.available {
+    background: #E5F1E8;
+    color: #27613D;
+}
+
+.shared-book-status.reserved {
+    background: #FFF0D9;
+    color: #95601D;
+}
+
+.shared-book-status.unavailable {
+    background: #F0EEE9;
+    color: #69645C;
+}
+
+.shared-book-status.closed {
+    background: #FCEAE4;
+    color: #A04432;
+}
+
+.shared-book-date {
+    display: block;
+    color: #88837A;
+    font-size: 10px;
+}
+
+.shared-book-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.shared-book-edit,
+.shared-book-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 10px;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.shared-book-edit {
+    border: 1px solid #1B4332;
+    background: white;
+    color: #1B4332;
+}
+
+.shared-book-delete {
+    border: 1px solid #E8D1CA;
+    background: #FFF7F4;
+    color: #A04432;
+}
+
+.shared-book-edit:hover {
+    background: #EAF1EC;
+}
+
+.shared-book-delete:hover {
+    background: #FCEAE4;
+}
+
+.shared-book-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.shared-books-empty {
+    grid-column: 1 / -1;
+}
+
+.shared-books-empty a {
+    display: inline-flex;
+    margin-top: 13px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #1B4332;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.profile-list-actions {
+    flex: 1 0 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 12px;
+    padding-top: 13px;
+    border-top: 1px solid #EEE9E2;
+}
+
+.profile-list-actions > p {
+    margin: 0;
+    color: #77736D;
+    font-size: 11px;
+}
+
+.profile-target-list {
+    width: 100%;
+    min-height: 37px;
+    padding: 7px 10px;
+    border: 1px solid #D8E3DA;
+    border-radius: 7px;
+    background: white;
+    color: #1B4332;
+    font-family: inherit;
+    font-size: 11px;
+    outline: none;
+}
+
+.profile-list-action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.profile-list-action-buttons button {
+    min-height: 35px;
+    padding: 0 11px;
+    border: 1px solid #1B4332;
+    border-radius: 7px;
+    background: white;
+    color: #1B4332;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.profile-list-action-buttons button:last-child {
+    background: #1B4332;
+    color: white;
+}
+
+.profile-list-action-buttons button:hover {
+    opacity: 0.85;
+}
+
+.profile-list-action-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 850px) {
+    .shared-books-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .shared-books-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .shared-books-add-button {
+        width: 100%;
+    }
+
+    .shared-book-card {
+        flex-wrap: wrap;
+    }
+
+    .shared-book-information {
+        min-width: calc(100% - 100px);
+    }
+
+    .shared-book-actions {
+        width: 100%;
+        flex-direction: row;
+    }
+
+    .shared-book-actions > * {
+        flex: 1;
+    }
+
+    .profile-list-action-buttons {
+        flex-direction: column;
+    }
+
+    .profile-list-action-buttons button {
+        width: 100%;
+    }
+}

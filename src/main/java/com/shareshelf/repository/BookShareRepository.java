@@ -12,4 +12,6 @@ public interface BookShareRepository extends JpaRepository<BookShare, Long> {
     Optional<BookShare> findByIdAndUser_Id(Long shareId, Long userId);
 
     List<BookShare> findAllByUser_Id(Long userId);
+
+    List<BookShare> findAllByUser_IdAndBook_Id(Long userId, Long bookId);
 }

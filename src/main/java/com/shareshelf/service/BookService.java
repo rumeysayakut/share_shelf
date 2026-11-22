@@ -44,8 +44,9 @@ public class BookService {
 
     public List<BookResponseDto> getAllBooks() {
         return bookRepository.findAll(
-                Sort.by(Sort.Direction.DESC, "createdAt")
-        ).stream()
+                        Sort.by(Sort.Direction.DESC, "createdAt")
+                ).stream()
+                .filter(book -> book.getDeletedAt() == null)
                 .map(bookMapper::toResponseDto)
                 .toList();
     }
@@ -57,6 +58,7 @@ public class BookService {
     public BookResponseDto getBookForEdit(Long id, User currentUser) {
         Book book = findBookById(id);
         checkPermission(book, currentUser);
+        ensureNotDeleted(book);
         return bookMapper.toResponseDto(book);
     }
 
@@ -129,6 +131,7 @@ public class BookService {
         Book book = findBookById(id);
 
         checkPermission(book, currentUser);
+        ensureNotDeleted(book);
 
         String title = request.getTitle().trim();
         String author = request.getAuthor().trim();
@@ -158,6 +161,7 @@ public class BookService {
 
         Book book = findBookById(id);
         checkPermission(book, currentUser);
+        ensureNotDeleted(book);
 
         String description = geminiService.generateBookSummary(
                 book.getTitle(),
@@ -191,12 +195,21 @@ public class BookService {
 
         boolean isCreator =
                 book.getCreatedBy() != null
-                && book.getCreatedBy().getId()
+                        && book.getCreatedBy().getId()
                         .equals(currentUser.getId());
 
         if (!isAdmin && !isCreator) {
             throw new AccessDeniedException(
                     "Bu kitabı düzenleme yetkiniz yok."
+            );
+        }
+    }
+
+    private void ensureNotDeleted(Book book) {
+        if (book.getDeletedAt() != null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Bu kitap artık aktif değil."
             );
         }
     }
@@ -211,14 +224,18 @@ public class BookService {
 
         if (excludedBookId == null) {
             duplicateTitleAndAuthor =
-                    bookRepository.existsByTitleIgnoreCaseAndAuthorIgnoreCase(
-                            title, author
-                    );
+                    bookRepository
+                            .existsByTitleIgnoreCaseAndAuthorIgnoreCaseAndDeletedAtIsNull(
+                                    title,
+                                    author
+                            );
         } else {
             duplicateTitleAndAuthor =
                     bookRepository
-                            .existsByTitleIgnoreCaseAndAuthorIgnoreCaseAndIdNot(
-                                    title, author, excludedBookId
+                            .existsByTitleIgnoreCaseAndAuthorIgnoreCaseAndIdNotAndDeletedAtIsNull(
+                                    title,
+                                    author,
+                                    excludedBookId
                             );
         }
 
@@ -233,11 +250,13 @@ public class BookService {
             boolean duplicateIsbn;
 
             if (excludedBookId == null) {
-                duplicateIsbn = bookRepository.existsByIsbn(isbn);
+                duplicateIsbn =
+                        bookRepository.existsByIsbnAndDeletedAtIsNull(isbn);
             } else {
                 duplicateIsbn =
-                        bookRepository.existsByIsbnAndIdNot(
-                                isbn, excludedBookId
+                        bookRepository.existsByIsbnAndIdNotAndDeletedAtIsNull(
+                                isbn,
+                                excludedBookId
                         );
             }
 

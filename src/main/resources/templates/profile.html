@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -6,8 +7,10 @@
     <title>Profilim | ShareShelf</title>
     <link rel="stylesheet" th:href="@{/css/books.css}">
     <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/profile-enhancements.css}">
     <script th:src="@{/js/auth.js}" defer></script>
     <script th:src="@{/js/profile.js}" defer></script>
+    <script th:src="@{/js/profile-enhancements.js}" defer></script>
 </head>
 <body>
 <div th:replace="~{fragments/header :: header(${isAuthenticated})}"></div>
@@ -27,6 +30,25 @@
             </span>
         </div>
         <div class="profile-decoration">📚</div>
+    </section>
+
+    <section class="shared-books-section">
+        <div class="shared-books-heading">
+            <div>
+                <span class="profile-eyebrow">TOPLULUKLA PAYLAŞTIKLARIM</span>
+                <h2>Paylaştığım Kitaplar</h2>
+                <p>ShareShelf'e eklediğin ve paylaşımını yaptığın kitapları buradan yönetebilirsin.</p>
+            </div>
+            <a class="shared-books-add-button" th:href="@{/shares/new-book}">
+                ＋ Yeni Kitap Paylaş
+            </a>
+        </div>
+
+        <div class="profile-message" id="sharedBooksMessage" hidden></div>
+
+        <div class="shared-books-grid" id="sharedBooksGrid">
+            <div class="loading-message">Paylaştığın kitaplar yükleniyor...</div>
+        </div>
     </section>
 
     <section class="lists-section">
@@ -97,7 +119,7 @@
         <div class="list-toolbar">
             <div>
                 <h3>Listendeki Kitaplar</h3>
-                <p>Kitaplarının okuma durumunu buradan değiştirebilirsin.</p>
+                <p>Kitaplarının okuma durumunu ve diğer listelerdeki yerini yönetebilirsin.</p>
             </div>
             <button class="create-list-button add-to-list-button" id="showAddBook" type="button">
                 ＋ Kitap Ekle
