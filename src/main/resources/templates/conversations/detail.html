@@ -149,6 +149,10 @@
             cursor: pointer;
         }
 
+        .handover-button:hover {
+            background: #24563F;
+        }
+
         .handover-cancel {
             min-height: 43px;
             padding: 0 18px;
@@ -346,12 +350,12 @@
         </div>
 
         <section class="handover-panel"
-                 th:if="${conversation.borrowing.status.name() == 'ACCEPTED' or conversation.borrowing.status.name() == 'HANDOVER_PENDING' or conversation.borrowing.status.name() == 'BORROWED'}">
+                 th:if="${conversation.borrowing.status.name() == 'ACCEPTED' or conversation.borrowing.status.name() == 'HANDOVER_PENDING' or conversation.borrowing.status.name() == 'BORROWED' or conversation.borrowing.status.name() == 'RETURN_PENDING' or conversation.borrowing.status.name() == 'RETURNED'}">
 
-            <h3>Kitap teslim durumu</h3>
+            <h3>Kitap teslim ve iade durumu</h3>
 
             <p th:if="${conversation.borrowing.status.name() == 'ACCEPTED'}">
-                Görüşme aşamasındasınız. Teslimat gerçekleştiğinde iki taraf da onay vermelidir.
+                Görüşme aşamasındasınız. Kitap fiziksel olarak teslim edildiğinde iki taraf da onay vermelidir.
             </p>
 
             <p th:if="${conversation.borrowing.status.name() == 'HANDOVER_PENDING'}">
@@ -359,7 +363,15 @@
             </p>
 
             <p th:if="${conversation.borrowing.status.name() == 'BORROWED'}">
-                İki taraf da teslimatı onayladı. Kitap ödünç verilmiş durumda.
+                İki taraf da teslimatı onayladı. Kitap ödünç verilmiş durumda. Kullanımınız tamamlandığında kitabı sahibine geri teslim edebilirsiniz.
+            </p>
+
+            <p th:if="${conversation.borrowing.status.name() == 'RETURN_PENDING'}">
+                Ödünç alan kişi iade talebi oluşturdu. Kitap fiziksel olarak sahibine teslim edildiğinde kitap sahibi iade işlemini onaylamalıdır.
+            </p>
+
+            <p th:if="${conversation.borrowing.status.name() == 'RETURNED'}">
+                Kitap sahibine geri teslim edildi ve iade işlemi tamamlandı. Kitap paylaşımı yeniden aktif durumda.
             </p>
 
             <span class="handover-status"
@@ -377,7 +389,19 @@
                 Ödünç verildi
             </span>
 
-            <div class="handover-confirmations">
+            <span class="handover-status"
+                  th:if="${conversation.borrowing.status.name() == 'RETURN_PENDING'}">
+                İade onayı bekleniyor
+            </span>
+
+            <span class="handover-status"
+                  th:if="${conversation.borrowing.status.name() == 'RETURNED'}">
+                İade edildi
+            </span>
+
+            <div class="handover-confirmations"
+                 th:if="${conversation.borrowing.status.name() == 'ACCEPTED' or conversation.borrowing.status.name() == 'HANDOVER_PENDING' or conversation.borrowing.status.name() == 'BORROWED'}">
+
                 <span th:classappend="${conversation.borrowing.ownerHandoverConfirmed} ? ' confirmed' : ''"
                       th:text="${conversation.borrowing.ownerHandoverConfirmed} ? '✓ Kitap sahibi teslim etti' : '○ Kitap sahibi onayı bekleniyor'">
                     Kitap sahibi onayı
@@ -408,7 +432,8 @@
                     </button>
                 </form>
 
-                <form th:action="@{/borrowings/{id}/cancel(id=${conversation.borrowing.id})}"
+                <form th:if="${!conversation.borrowing.ownerHandoverConfirmed and !conversation.borrowing.borrowerHandoverConfirmed}"
+                      th:action="@{/borrowings/{id}/cancel(id=${conversation.borrowing.id})}"
                       method="post"
                       onsubmit="return confirm('Görüşmeyi iptal etmek istediğine emin misin?');">
                     <button type="submit" class="handover-cancel">
@@ -417,6 +442,45 @@
                 </form>
 
             </div>
+
+            <div class="handover-actions"
+                 th:if="${conversation.borrowing.status.name() == 'BORROWED'}">
+
+                <form th:if="${conversation.borrowing.borrower.id == currentUserId}"
+                      th:action="@{/borrowings/{id}/request-return(id=${conversation.borrowing.id})}"
+                      method="post"
+                      onsubmit="return confirm('Kitabı sahibine geri teslim etmek için iade talebi oluşturmak istiyor musun?');">
+                    <button type="submit" class="handover-button">
+                        İade Etmek İstiyorum
+                    </button>
+                </form>
+
+                <span th:if="${conversation.borrowing.bookShare.user.id == currentUserId}"
+                      style="color: #77736D; font-size: 13px;">
+                    Kitap şu anda ödünç alan kişide. İade talebi oluşturmasını bekleyebilirsiniz.
+                </span>
+
+            </div>
+
+            <div class="handover-actions"
+                 th:if="${conversation.borrowing.status.name() == 'RETURN_PENDING'}">
+
+                <form th:if="${conversation.borrowing.bookShare.user.id == currentUserId}"
+                      th:action="@{/borrowings/{id}/confirm-return(id=${conversation.borrowing.id})}"
+                      method="post"
+                      onsubmit="return confirm('Kitabı fiziksel olarak geri aldığınızı onaylıyor musunuz?');">
+                    <button type="submit" class="handover-button">
+                        Kitabı Geri Aldım
+                    </button>
+                </form>
+
+                <span th:if="${conversation.borrowing.borrower.id == currentUserId}"
+                      style="color: #77736D; font-size: 13px;">
+                    İade talebiniz gönderildi. Kitap sahibinin teslim aldığını onaylaması bekleniyor.
+                </span>
+
+            </div>
+
         </section>
 
         <div class="conversation-notice"

@@ -1,36 +1,43 @@
 
 package com.shareshelf.service;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.shareshelf.dto.request.BookShareRequestDto;
 import com.shareshelf.dto.response.BookShareResponseDto;
 import com.shareshelf.entity.Book;
 import com.shareshelf.entity.BookShare;
 import com.shareshelf.entity.BookShareStatus;
+import com.shareshelf.entity.BorrowingStatus;
 import com.shareshelf.entity.ShareType;
 import com.shareshelf.entity.User;
 import com.shareshelf.mapper.BookShareMapper;
 import com.shareshelf.repository.BookRepository;
 import com.shareshelf.repository.BookShareRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import com.shareshelf.repository.BorrowingRepository;
 
-import java.util.List;
+import jakarta.transaction.Transactional;
 
 @Service
 public class BookShareService {
 
     private final BookShareRepository bookShareRepository;
     private final BookRepository bookRepository;
+    private final BorrowingRepository borrowingRepository;
     private final BookShareMapper bookShareMapper;
 
     public BookShareService(
             BookShareRepository bookShareRepository,
             BookRepository bookRepository,
+            BorrowingRepository borrowingRepository,
             BookShareMapper bookShareMapper) {
         this.bookShareRepository = bookShareRepository;
         this.bookRepository = bookRepository;
+        this.borrowingRepository = borrowingRepository;
         this.bookShareMapper = bookShareMapper;
     }
 
@@ -82,6 +89,7 @@ public class BookShareService {
                 .toList();
     }
 
+    @Transactional
     public List<BookShareResponseDto> getActiveSharesByUserId(Long userId) {
         return bookShareRepository.findAll()
                 .stream()
@@ -92,8 +100,32 @@ public class BookShareService {
                 .filter(share -> share.getShareType() == ShareType.LOAN)
                 .filter(share -> share.getUser() != null)
                 .filter(share -> share.getUser().getId().equals(userId))
-                .map(bookShareMapper::toResponseDto)
+                .map(this::toMyShareResponseDto)
                 .toList();
+    }
+
+    private BookShareResponseDto toMyShareResponseDto(BookShare share) {
+        BookShareResponseDto response = bookShareMapper.toResponseDto(share);
+
+        borrowingRepository
+                .findFirstByBookShare_IdOrderByRequestedAtDesc(share.getId())
+                .ifPresent(borrowing -> {
+                    if (isConversationAvailable(borrowing.getStatus())) {
+                        response.setConversationBorrowingId(borrowing.getId());
+                    }
+                });
+
+        return response;
+    }
+
+    private boolean isConversationAvailable(BorrowingStatus status) {
+        return status == BorrowingStatus.ACCEPTED ||
+                status == BorrowingStatus.HANDOVER_PENDING ||
+                status == BorrowingStatus.BORROWED ||
+                status == BorrowingStatus.RETURN_PENDING ||
+                status == BorrowingStatus.RETURNED ||
+                status == BorrowingStatus.OVERDUE ||
+                status == BorrowingStatus.DISPUTED;
     }
 
     @Transactional

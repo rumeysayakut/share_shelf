@@ -128,6 +128,38 @@ public class BorrowingController {
         return "redirect:/conversations/borrowing/" + borrowingId;
     }
 
+    @PostMapping("/{borrowingId}/request-return")
+    public String requestReturn(
+            @PathVariable Long borrowingId,
+            @AuthenticationPrincipal User currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        borrowingService.requestReturn(borrowingId, currentUser);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "İade talebiniz kitap sahibine iletildi. Kitabı teslim ettikten sonra sahibinin onayını bekleyin."
+        );
+
+        return "redirect:/conversations/borrowing/" + borrowingId;
+    }
+
+    @PostMapping("/{borrowingId}/confirm-return")
+    public String confirmReturn(
+            @PathVariable Long borrowingId,
+            @AuthenticationPrincipal User currentUser,
+            RedirectAttributes redirectAttributes) {
+
+        borrowingService.confirmReturn(borrowingId, currentUser);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Kitabın iadesini onayladınız. Paylaşımınız yeniden aktif hâle geldi."
+        );
+
+        return "redirect:/conversations/borrowing/" + borrowingId;
+    }
+
     @PostMapping("/{borrowingId}/cancel")
     public String cancelAcceptedRequest(
             @PathVariable Long borrowingId,

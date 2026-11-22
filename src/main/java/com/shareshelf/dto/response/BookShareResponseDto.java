@@ -1,3 +1,4 @@
+
 package com.shareshelf.dto.response;
 
 import com.shareshelf.entity.BookShareStatus;
@@ -31,6 +32,8 @@ public class BookShareResponseDto {
 
     private String conditionDescription;
     private String description;
+
+    private Long conversationBorrowingId;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

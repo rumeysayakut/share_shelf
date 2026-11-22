@@ -33,6 +33,10 @@ public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
             Long ownerId
     );
 
+    Optional<Borrowing> findFirstByBookShare_IdOrderByRequestedAtDesc(
+            Long bookShareId
+    );
+
     List<Borrowing> findAllByBookShare_User_IdAndStatusOrderByRequestedAtDesc(
             Long ownerId,
             BorrowingStatus status

@@ -183,7 +183,6 @@ public class BorrowingService {
 
         borrowing.setStatus(BorrowingStatus.ACCEPTED);
         borrowing.setAcceptedAt(LocalDateTime.now());
-
         bookShare.setStatus(BookShareStatus.RESERVED);
 
         borrowingRepository.save(borrowing);
@@ -277,6 +276,76 @@ public class BorrowingService {
     }
 
     @Transactional
+    public BorrowingResponseDto requestReturn(Long borrowingId, User currentUser) {
+        validateUser(currentUser);
+
+        Borrowing borrowing = borrowingRepository.findById(borrowingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ödünç alma işlemi bulunamadı."
+                ));
+
+        if (!borrowing.getBorrower().getId().equals(currentUser.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "İade talebini yalnızca kitabı ödünç alan kişi oluşturabilir."
+            );
+        }
+
+        if (borrowing.getStatus() != BorrowingStatus.BORROWED &&
+                borrowing.getStatus() != BorrowingStatus.OVERDUE) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Bu kitap için şu anda iade talebi oluşturulamaz."
+            );
+        }
+
+        borrowing.setStatus(BorrowingStatus.RETURN_PENDING);
+        borrowing.setReturnRequestedAt(LocalDateTime.now());
+
+        return borrowingMapper.toResponseDto(
+                borrowingRepository.save(borrowing)
+        );
+    }
+
+    @Transactional
+    public BorrowingResponseDto confirmReturn(Long borrowingId, User currentUser) {
+        validateUser(currentUser);
+
+        Borrowing borrowing = borrowingRepository.findById(borrowingId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ödünç alma işlemi bulunamadı."
+                ));
+
+        if (!borrowing.getBookShare().getUser().getId().equals(currentUser.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Kitabın iadesini yalnızca kitap sahibi onaylayabilir."
+            );
+        }
+
+        if (borrowing.getStatus() != BorrowingStatus.RETURN_PENDING) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Bu işlem şu anda iade onayı beklemiyor."
+            );
+        }
+
+        borrowing.setStatus(BorrowingStatus.RETURNED);
+        borrowing.setReturnedAt(LocalDateTime.now());
+
+        BookShare bookShare = borrowing.getBookShare();
+        bookShare.setStatus(BookShareStatus.ACTIVE);
+
+        bookShareRepository.save(bookShare);
+
+        return borrowingMapper.toResponseDto(
+                borrowingRepository.save(borrowing)
+        );
+    }
+
+    @Transactional
     public BorrowingResponseDto cancelAcceptedRequest(
             Long borrowingId,
             User currentUser) {
@@ -306,6 +375,14 @@ public class BorrowingService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Bu aşamada paylaşım iptal edilemez."
+            );
+        }
+
+        if (borrowing.isOwnerHandoverConfirmed() ||
+                borrowing.isBorrowerHandoverConfirmed()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Teslimat onayı verildikten sonra paylaşım iptal edilemez. Önce kitap iade edilmelidir."
             );
         }
 
